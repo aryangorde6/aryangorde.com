@@ -1,0 +1,227 @@
+{% import "macros.html.j2" as m %}
+{% set n = sec.work %}
+<section class="section section-work" id="work" tabindex="-1" aria-labelledby="work-title">
+  <div class="wrap">
+    {{ m.sec_head(n, 'work', 'Work', sheet_count, (1 + cases|length + projects|length) ~ ' builds, opened up') }}
+  </div>
+
+  {# ---- .1 Teesri Shikayat — the featured build, on an ink sheet --------- #}
+  {% set f = featured %}
+  {% set words = f.name.split(' ') %}
+  <article class="featured ink" id="{{ f.id }}" tabindex="-1" aria-labelledby="{{ f.id }}-title">
+    <div class="wrap">
+      <div class="feat-head rv">
+        <p class="label label-accent">{{ m.nn(n) }}.1 — {{ f.tag }}</p>
+        <h3 class="feat-name" id="{{ f.id }}-title">{{ words[:-1]|join(' ') }} <span class="feat-last">{{ words[-1] }}</span></h3>
+        <p class="feat-gloss">{{ f.gloss }}</p>
+      </div>
+
+      <div class="feat-grid">
+        <div class="feat-intro rv">
+          <p class="feat-summary">{{ f.summary }}</p>
+          <div class="btn-row">
+            {%- for link in f.links %}
+            <a class="btn {{ 'btn-accent' if loop.first else 'btn-outline' }}" href="{{ link.href }}"{{ m.ext(link.href) }}>{{ link.label }} <span class="arr" aria-hidden="true">↗</span></a>
+            {%- endfor %}
+          </div>
+          <ul class="feat-figures">
+            {%- for fig in f.figures %}
+            <li><span class="feat-fig">{{ fig.value }}</span><span class="feat-fig-note">{{ fig.note }}</span></li>
+            {%- endfor %}
+          </ul>
+        </div>
+
+        <figure class="ring rv" data-draw>
+          <svg viewBox="0 0 {{ ring.w }} {{ ring.h }}" role="img" aria-labelledby="ring-t ring-d">
+            <title id="ring-t">Schematic of the demo incident</title>
+            <desc id="ring-d">{{ ring.counts.reported }} homes report dirty water within 72 hours. Every enrolled home within 250 metres
+              is warned — {{ ring.counts.warned }} in all, {{ ring.counts.never }} of which never complained. Homes outside the ring are not.</desc>
+            <g class="ring-zone" style="transform-origin: {{ ring.cx }}px {{ ring.cy }}px">
+              <circle class="ring-fill" cx="{{ ring.cx }}" cy="{{ ring.cy }}" r="{{ ring.r }}" />
+              <circle class="ring-guide" cx="{{ ring.cx }}" cy="{{ ring.cy }}" r="{{ ring.r // 2 }}" />
+            </g>
+            <line class="ring-scale" x1="{{ ring.cx }}" y1="{{ ring.cy }}" x2="{{ ring.scale.x2 }}" y2="{{ ring.scale.y2 }}" />
+            <text class="ring-label" x="{{ ring.scale.lx }}" y="{{ ring.scale.ly }}" transform="rotate(-32 {{ ring.scale.lx }} {{ ring.scale.ly }})">250 m</text>
+            {%- for h in ring.homes %}
+            <rect class="home home-{{ h.kind }}" x="{{ h.x }}" y="{{ h.y }}" width="10" height="10" style="--d: {{ h.delay }}" />
+            {%- endfor %}
+            <g class="ring-legend" transform="translate(18 22)">
+              <rect class="home home-reported" x="0" y="-8" width="10" height="10" />
+              <text x="18" y="1">Reported · {{ ring.counts.reported }}</text>
+              <rect class="home home-warned home-legend" x="0" y="12" width="10" height="10" />
+              <text x="18" y="21">Warned, no complaint · {{ ring.counts.never }}</text>
+              <rect class="home home-outside" x="0" y="32" width="10" height="10" />
+              <text x="18" y="41">Outside ring · not warned</text>
+            </g>
+          </svg>
+          <figcaption class="fig-cap fig-cap-dark"><span><b>Fig. 2</b> — Schematic of the recorded demo incident (simulated homes):
+            three reports inside 72 hours, and every enrolled home within 250 m warned in Hindi.</span></figcaption>
+        </figure>
+      </div>
+
+      <div class="feat-quote rv">
+        <blockquote>{{ f.quote[0] }} <em>{{ f.quote[1] }}</em></blockquote>
+        <p>{{ f.quote_note }}</p>
+      </div>
+
+      <figure class="pipeline rv" data-pipeline>
+        <ol class="pipe pipe-7">
+          {%- for label, sub, kind in f.flow %}
+          <li class="pipe-step{% if kind %} pipe-{{ kind }}{% endif %}">
+            <span class="pipe-num">{{ m.nn(loop.index) }}</span>
+            <span class="pipe-label">{{ label }}</span>
+            <span class="pipe-sub">{{ sub }}</span>
+          </li>
+          {%- endfor %}
+        </ol>
+        <figcaption class="fig-cap fig-cap-dark"><span><b>Fig. 3</b> — One case, as the demo recorded it: a single Step Functions execution
+          waiting on people, never on a timer.</span></figcaption>
+      </figure>
+
+      <div class="feat-detail">
+        {%- for title, text in f.detail %}
+        <div class="detail rv">
+          <h4 class="detail-title"><span>{{ m.nn(loop.index) }}</span>{{ title }}</h4>
+          <p>{{ text }}</p>
+        </div>
+        {%- endfor %}
+      </div>
+
+      <div class="feat-tech rv">
+        <span class="label">Built with</span>
+        {{ m.chips(f.tech) }}
+      </div>
+    </div>
+  </article>
+
+  <div class="wrap">
+    {# ---- .2, .3 — case studies on paper, each with its own drawing ------- #}
+    {%- for c in cases %}
+    {% set fig_no = 3 + loop.index %}
+    <article class="project" id="{{ c.id }}" tabindex="-1" aria-labelledby="{{ c.id }}-title">
+      <header class="project-head rv">
+        <div>
+          <p class="label label-accent">{{ m.nn(n) }}.{{ loop.index + 1 }} — {{ c.tag }}</p>
+          <h3 class="project-name" id="{{ c.id }}-title">{{ c.name }}</h3>
+        </div>
+        <div class="btn-row">
+          {%- for link in c.links %}
+          <a class="btn {{ 'btn-primary' if loop.first else 'btn-ghost' }}" href="{{ link.href }}"{{ m.ext(link.href) }}>{{ link.label }} <span class="arr" aria-hidden="true">↗</span></a>
+          {%- endfor %}
+        </div>
+      </header>
+
+      <div class="feat-grid case-grid">
+        <p class="feat-summary rv">{{ c.summary }}</p>
+        <ul class="feat-figures rv">
+          {%- for fig in c.figures %}
+          <li><span class="feat-fig">{{ fig.value }}</span><span class="feat-fig-note">{{ fig.note }}</span></li>
+          {%- endfor %}
+        </ul>
+      </div>
+
+      {%- if c.figure == 'timeline' %}
+      {% set tl = c.timeline %}
+      {# Drawn to scale: every event sits at its second on the axis. Below 1100px
+         it reads as a plain timeline, top to bottom. #}
+      <figure class="tl rv">
+        <div class="tl-plot" style="--span: {{ tl.span }}">
+          <ol class="tl-events">
+            {%- for e in tl.events %}
+            <li class="tl-ev tl-{{ e.lane }} tl-row-{{ e.row }}{% if e.get('kind') %} tl-{{ e.kind }}{% endif %}{% if e.t / tl.span > 0.6 %} tl-flip{% endif %}" style="--t: {{ e.t }}">
+              <span class="tl-time">{{ e.time }} · {{ 'Caller' if e.lane == 'caller' else c.name }}</span>
+              <span class="tl-what">{{ e.what }}</span>
+              {%- if e.get('note') %}<span class="tl-note">{{ e.note }}</span>{% endif %}
+            </li>
+            {%- endfor %}
+          </ol>
+          <div class="tl-axis" aria-hidden="true">
+            {%- for sec_ in range(0, tl.span + 1, 10) %}<span class="tl-tick" style="--t: {{ sec_ }}">{{ sec_ }} s</span>{% endfor -%}
+          </div>
+          {%- for d in tl.dims %}
+          <span class="tl-dim" style="--a: {{ d.a }}; --b: {{ d.b }}" aria-hidden="true"><span>{{ d.label }}</span></span>
+          {%- endfor %}
+        </div>
+        <figcaption class="fig-cap"><span><b>Fig. {{ fig_no }}</b> — {{ tl.caption }}</span></figcaption>
+      </figure>
+      {%- elif c.figure == 'chain' %}
+      {% set ch = c.chain %}
+      <figure class="chain rv">
+        <ol class="ch-row">
+          {%- for node in ch.nodes %}
+          <li class="ch-node{% if loop.first %} ch-root{% endif %}{% if loop.last %} ch-end{% endif %}">
+            <span class="ch-name">{{ node[0] }}</span>
+            <span class="ch-risk">risk {{ node[1] }}</span>
+            {%- if loop.last %}<span class="ch-verdict">{{ ch.verdict }}</span>{% endif %}
+          </li>
+          {%- if not loop.last %}{% set l = ch.links[loop.index0] %}
+          <li class="ch-link"><span class="ch-cls">{{ l[0] }}</span><span class="ch-w">{{ l[1] }}</span><span class="ch-wire" aria-hidden="true"></span><span class="ch-why">{{ l[2] }}</span></li>
+          {%- endif %}
+          {%- endfor %}
+        </ol>
+        {% set b = ch.branch %}
+        <p class="ch-from">Another paper citing {{ ch.nodes[1][0] }}:</p>
+        <div class="ch-row ch-branch">
+          <p class="ch-node ch-ghost"><span class="ch-name">{{ ch.nodes[1][0] }}</span><span class="ch-risk">risk {{ ch.nodes[1][1] }}</span></p>
+          <p class="ch-link"><span class="ch-cls">{{ b[0][0] }}</span><span class="ch-w">{{ b[0][1] }}</span><span class="ch-wire" aria-hidden="true"></span><span class="ch-why">{{ b[0][2] }}</span></p>
+          <p class="ch-node ch-weak"><span class="ch-name">{{ b[1][0] }}</span><span class="ch-risk">risk {{ b[1][1] }}</span><span class="ch-verdict">{{ b[2] }}</span></p>
+        </div>
+        <p class="ch-rule">{{ ch.rule }}</p>
+        <figcaption class="fig-cap"><span><b>Fig. {{ fig_no }}</b> — {{ ch.caption }}</span></figcaption>
+      </figure>
+      {%- endif %}
+
+      <div class="feat-detail">
+        {%- for title, text in c.detail %}
+        <div class="detail rv">
+          <h4 class="detail-title"><span>{{ m.nn(loop.index) }}</span>{{ title }}</h4>
+          <p>{{ text }}</p>
+        </div>
+        {%- endfor %}
+      </div>
+
+      <div class="project-tech rv">
+        <span class="label">Built with</span>
+        {{ m.chips(c.tech) }}
+      </div>
+    </article>
+    {%- endfor %}
+
+    {# ---- .4+ — builds drawn as a flow -------------------------------------- #}
+    {%- for p in projects %}
+    <article class="project" id="{{ p.id }}" tabindex="-1" aria-labelledby="{{ p.id }}-title">
+      <header class="project-head rv">
+        <div>
+          <p class="label label-accent">{{ m.nn(n) }}.{{ loop.index + 1 + cases|length }} — {{ p.tag }}</p>
+          <h3 class="project-name" id="{{ p.id }}-title">{{ p.name }}</h3>
+        </div>
+        <div class="btn-row">
+          {%- for link in p.links %}
+          <a class="btn {{ 'btn-primary' if loop.first else 'btn-ghost' }}" href="{{ link.href }}" aria-label="{{ link.aria }}"{{ m.ext(link.href) }}>{{ link.label }} <span class="arr" aria-hidden="true">↗</span></a>
+          {%- endfor %}
+        </div>
+      </header>
+
+      <p class="project-blurb rv">{{ p.blurb }}</p>
+
+      <figure class="pipeline rv" data-pipeline>
+        <ol class="pipe">
+          {%- for label, sub in p.pipeline %}
+          <li class="pipe-step">
+            <span class="pipe-num">{{ m.nn(loop.index) }}</span>
+            <span class="pipe-label">{{ label }}</span>
+            <span class="pipe-sub">{{ sub }}</span>
+          </li>
+          {%- endfor %}
+        </ol>
+        <figcaption class="fig-cap"><span><b>Fig. {{ 3 + cases|length + loop.index }}</b> — {{ p.caption }}</span></figcaption>
+      </figure>
+
+      <div class="project-tech rv">
+        <span class="label">Built with</span>
+        {{ m.chips(p.tech) }}
+      </div>
+    </article>
+    {%- endfor %}
+  </div>
+</section>

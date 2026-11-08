@@ -1,0 +1,208 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: >-
+  aryangorde.com — static portfolio on a private S3 bucket behind CloudFront.
+  Deploy in ap-south-1 (the bucket lives in Mumbai; CloudFront itself is global).
+  The certificate must be an ACM certificate in us-east-1 (a CloudFront rule).
+  Leave CertificateArn empty to run on the *.cloudfront.net address only.
+
+Parameters:
+  DomainName:
+    Type: String
+    Default: aryangorde.com
+  CertificateArn:
+    Type: String
+    Default: ""
+    Description: ACM certificate (us-east-1) covering DomainName (and www.DomainName if IncludeWww; a *.DomainName wildcard counts).
+  IncludeWww:
+    Type: String
+    Default: "true"
+    AllowedValues: ["true", "false"]
+    Description: >-
+      Attach www.DomainName too. "false" while the certificate covers only the bare domain
+      (e.g. www still points elsewhere and its CAA blocks Amazon).
+
+Conditions:
+  HasCert: !Not [!Equals [!Ref CertificateArn, ""]]
+  WithWww: !And [!Condition HasCert, !Equals [!Ref IncludeWww, "true"]]
+
+Resources:
+  # Private bucket: nothing is public; only this distribution can read it (OAC below).
+  SiteBucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerEnforced
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      # Old versions are kept 30 days, so a bad deploy can be rolled back.
+      VersioningConfiguration:
+        Status: Enabled
+      LifecycleConfiguration:
+        Rules:
+          - Id: expire-old-versions
+            Status: Enabled
+            NoncurrentVersionExpiration:
+              NoncurrentDays: 30
+            AbortIncompleteMultipartUpload:
+              DaysAfterInitiation: 1
+      Tags:
+        - Key: project
+          Value: aryangorde-site
+
+  OriginAccessControl:
+    Type: AWS::CloudFront::OriginAccessControl
+    Properties:
+      OriginAccessControlConfig:
+        Name: !Sub "${AWS::StackName}-oac"
+        OriginAccessControlOriginType: s3
+        SigningBehavior: always
+        SigningProtocol: sigv4
+
+  # www.aryangorde.com → https://aryangorde.com (301), keeping the path and query.
+  WwwRedirect:
+    Type: AWS::CloudFront::Function
+    Properties:
+      Name: !Sub "${AWS::StackName}-www-redirect"
+      AutoPublish: true
+      FunctionConfig:
+        Comment: Redirect www to the bare domain
+        Runtime: cloudfront-js-2.0
+      FunctionCode: |
+        function handler(event) {
+          var request = event.request;
+          var host = request.headers.host ? request.headers.host.value : '';
+          if (host.indexOf('www.') !== 0) {
+            return request;
+          }
+          var qs = [];
+          for (var key in request.querystring) {
+            var param = request.querystring[key];
+            var values = param.multiValue ? param.multiValue : [param];
+            for (var i = 0; i < values.length; i++) {
+              qs.push(values[i].value === '' ? key : key + '=' + values[i].value);
+            }
+          }
+          return {
+            statusCode: 301,
+            statusDescription: 'Moved Permanently',
+            headers: {
+              location: { value: 'https://' + host.slice(4) + request.uri + (qs.length ? '?' + qs.join('&') : '') }
+            }
+          };
+        }
+
+  # HSTS deliberately without includeSubDomains: teesrakaan/debtclear/mnemos.aryangorde.com
+  # are separate servers and must not be forced onto HTTPS by this site.
+  SecurityHeaders:
+    Type: AWS::CloudFront::ResponseHeadersPolicy
+    Properties:
+      ResponseHeadersPolicyConfig:
+        Name: !Sub "${AWS::StackName}-security-headers"
+        SecurityHeadersConfig:
+          StrictTransportSecurity:
+            AccessControlMaxAgeSec: 31536000
+            IncludeSubdomains: false
+            Preload: false
+            Override: true
+          ContentTypeOptions:
+            Override: true
+          FrameOptions:
+            FrameOption: DENY
+            Override: true
+          ReferrerPolicy:
+            ReferrerPolicy: strict-origin-when-cross-origin
+            Override: true
+        CustomHeadersConfig:
+          Items:
+            - Header: Permissions-Policy
+              Value: "camera=(), microphone=(), geolocation=(), interest-cohort=()"
+              Override: true
+
+  Distribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Enabled: true
+        Comment: !Sub "${DomainName} portfolio"
+        Aliases: !If
+          - WithWww
+          - [!Ref DomainName, !Sub "www.${DomainName}"]
+          - !If [HasCert, [!Ref DomainName], !Ref AWS::NoValue]
+        ViewerCertificate: !If
+          - HasCert
+          - AcmCertificateArn: !Ref CertificateArn
+            SslSupportMethod: sni-only
+            MinimumProtocolVersion: TLSv1.2_2021
+          - CloudFrontDefaultCertificate: true
+        DefaultRootObject: index.html
+        HttpVersion: http2and3
+        IPV6Enabled: true
+        PriceClass: PriceClass_All
+        Origins:
+          - Id: site-bucket
+            DomainName: !GetAtt SiteBucket.RegionalDomainName
+            OriginAccessControlId: !GetAtt OriginAccessControl.Id
+            S3OriginConfig:
+              OriginAccessIdentity: ""
+        DefaultCacheBehavior:
+          TargetOriginId: site-bucket
+          ViewerProtocolPolicy: redirect-to-https
+          AllowedMethods: [GET, HEAD]
+          CachedMethods: [GET, HEAD]
+          Compress: true
+          # Managed-CachingOptimized: honours the Cache-Control set by deploy.sh; gzip + brotli.
+          CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6
+          ResponseHeadersPolicyId: !Ref SecurityHeaders
+          FunctionAssociations:
+            - EventType: viewer-request
+              FunctionARN: !GetAtt WwwRedirect.FunctionARN
+        # The bucket answers 403 for a missing key (CloudFront may not list it).
+        # Unknown paths get the home page with a real 404 status.
+        CustomErrorResponses:
+          - ErrorCode: 403
+            ResponseCode: 404
+            ResponsePagePath: /index.html
+            ErrorCachingMinTTL: 60
+          - ErrorCode: 404
+            ResponseCode: 404
+            ResponsePagePath: /index.html
+            ErrorCachingMinTTL: 60
+      Tags:
+        - Key: project
+          Value: aryangorde-site
+
+  SiteBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref SiteBucket
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: CloudFrontReadOnly
+            Effect: Allow
+            Principal:
+              Service: cloudfront.amazonaws.com
+            Action: s3:GetObject
+            Resource: !Sub "${SiteBucket.Arn}/*"
+            Condition:
+              StringEquals:
+                AWS:SourceArn: !Sub "arn:aws:cloudfront::${AWS::AccountId}:distribution/${Distribution}"
+
+Outputs:
+  BucketName:
+    Value: !Ref SiteBucket
+  DistributionId:
+    Value: !Ref Distribution
+  DistributionDomain:
+    Description: Point the DNS records at this name.
+    Value: !GetAtt Distribution.DomainName

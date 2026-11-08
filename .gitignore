@@ -1,0 +1,21 @@
+Portfolio-Website/
+Portfolio-Website-exact/
+Portfolio-Website-fresh/
+
+# Python build
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Never commit identity documents. This repo is public: anything committed here
+# can be read by anyone, and git history keeps it even after a later delete.
+*aadhaar*
+*Aadhaar*
+*AADHAAR*
+EAadhaar*
+*.pdf
+!Aryan_Gorde_Resume.pdf
+
+# Résumé source and builds — kept local. A committed copy would be public.
+resume/

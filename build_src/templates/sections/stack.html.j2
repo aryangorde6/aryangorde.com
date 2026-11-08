@@ -1,0 +1,65 @@
+{% import "macros.html.j2" as m %}
+{# ===========================================================================
+   §02 — the stack, drawn as the system it forms. The boxes are real HTML (so
+   they're readable, selectable and reflow on small screens); the wires behind
+   them are SVG computed by drawings.py in the same 1200×660 space. JS sends a
+   packet along each wire in sequence; without JS it's a still drawing.
+   =========================================================================== #}
+<section class="section section-alt sheet-grid" id="stack" tabindex="-1" aria-labelledby="stack-title">
+  <div class="wrap">
+    {{ m.sec_head(sec.stack, 'stack', 'Stack', sheet_count, 'the tools, drawn where they sit in a request') }}
+
+    <div class="stack-intro rv">
+      <p class="sec-intro">Every tool I reach for, placed at the hop where it does its job — from the
+        browser, through the edge and the application, out to data, background work and models.</p>
+      <div class="langs">
+        <span class="label">Written in</span>
+        {{ m.chips(languages, 'chips-solid') }}
+      </div>
+    </div>
+
+    <figure class="sys rv" data-sys>
+      <div class="sys-canvas">
+        <svg class="sys-wires" viewBox="0 0 {{ diagram.view_w }} {{ diagram.view_h }}" aria-hidden="true" focusable="false">
+          <defs>
+            <marker id="arrowhead" class="arrowhead" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M0 0L10 5L0 10z" />
+            </marker>
+          </defs>
+          <rect class="sys-boundary" x="{{ diagram.boundary.x }}" y="{{ diagram.boundary.y }}"
+                width="{{ diagram.boundary.w }}" height="{{ diagram.boundary.h }}" />
+          {%- for e in diagram.edges %}
+          <path class="wire" d="{{ e.d }}" marker-end="url(#arrowhead)"
+                data-from="{{ e.from }}" data-to="{{ e.to }}" data-t0="{{ e.t0 }}" data-t1="{{ e.t1 }}" />
+          {%- endfor %}
+          <g class="packets"></g>
+        </svg>
+
+        <div class="sys-runtime" style="--x:{{ diagram.boundary.label_x }}; --y:{{ diagram.boundary.label_y }}">
+          <span class="label">{{ stack_boundary.label }}</span>
+          {{ m.chips(stack_boundary['items'], 'chips-solid') }}
+        </div>
+
+        <ol class="sys-nodes">
+          {%- for n in stack_nodes %}
+          <li class="node" data-node="{{ n.id }}" style="--x:{{ n.x }}; --y:{{ n.y }}; --w:{{ n.w }}">
+            <div class="node-head"><span class="node-num">{{ m.nn(loop.index) }}</span><h3 class="node-title">{{ n.label }}</h3></div>
+            <p class="node-note">{{ n.note }}</p>
+            {{ m.chips(n['items']) }}
+          </li>
+          {%- endfor %}
+          <li class="node node-ci" data-node="ci" style="--x:{{ diagram.ci.x }}; --y:{{ diagram.ci.y }}; --w:{{ diagram.ci.w }}">
+            <div class="node-head"><span class="node-num">{{ m.nn(stack_nodes|length + 1) }}</span><h3 class="node-title">{{ stack_ci.label }}</h3></div>
+            <p class="node-note">{{ stack_ci.note }}</p>
+            {{ m.chips(stack_ci['items']) }}
+          </li>
+        </ol>
+      </div>
+
+      <figcaption class="fig-cap">
+        <span><b>Fig. 1</b> — A request, end to end. Hover a box to trace its connections.</span>
+        <button type="button" class="fig-btn" data-sys-toggle aria-pressed="false" hidden>Pause flow</button>
+      </figcaption>
+    </figure>
+  </div>
+</section>

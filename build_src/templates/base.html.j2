@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>{{ site.title }}</title>
+<meta name="description" content="{{ site.description }}" />
+<meta name="theme-color" content="#f1efe8" />
+<meta name="color-scheme" content="light" />
+<link rel="canonical" href="{{ site.domain }}/" />
+
+<meta property="og:type" content="website" />
+<meta property="og:title" content="{{ site.title }}" />
+<meta property="og:description" content="{{ site.og_description }}" />
+<meta property="og:url" content="{{ site.domain }}/" />
+<meta property="og:image" content="{{ site.domain }}/{{ photo.og }}" />
+<meta name="twitter:card" content="summary_large_image" />
+
+<link rel="preload" href="{{ fonts['archivo-var-latin'] }}" as="font" type="font/woff2" crossorigin />
+<link rel="preload" href="{{ fonts['jetbrains-mono-var-latin'] }}" as="font" type="font/woff2" crossorigin />
+<link rel="preload" href="{{ fonts['instrument-serif-italic-latin'] }}" as="font" type="font/woff2" crossorigin />
+
+<!--
+  ============================================================================
+  GENERATED FILE — DO NOT EDIT BY HAND.
+
+  Built by build.py from build_src/. Your edits here will be overwritten on
+  the next build. Edit these instead:
+
+     build_src/content.py            all the words
+     build_src/drawings.py           geometry for the two diagrams
+     build_src/templates/            the markup
+     build_src/static/css/site.css   the design system
+     build_src/static/js/site.js     the behaviour
+
+  Then run:  python3 build.py
+
+  DESIGN: an engineering drawing. Drafting-paper grid, one signal-orange
+  accent, expanded grotesk for titles, mono for annotation, an italic serif
+  for emphasis. Each section is a numbered sheet; the stack is drawn as the
+  system it actually forms.
+
+  Deterministic output: same sources in, byte-identical file out. No build
+  timestamp is embedded, so `--check` stays reliable.
+  ============================================================================
+-->
+
+{# Runs before first paint, so motion-gated styles never flash. Everything
+   that hides content until it animates is keyed off .reveal-armed, and the
+   timeout below disarms it if the main script never gets to reveal anything. #}
+<script>
+(function (d) {
+  var r = d.documentElement;
+  r.classList.add("js");
+  if (window.matchMedia && matchMedia("(prefers-reduced-motion: no-preference)").matches) {
+    r.classList.add("motion");
+    if ("IntersectionObserver" in window) {
+      r.classList.add("reveal-armed");
+      setTimeout(function () {
+        if (!d.querySelector(".rv.is-in")) r.classList.remove("reveal-armed");
+      }, 3500);
+    }
+  }
+})(document);
+</script>
+
+<style>
+@font-face {
+  font-family: "Archivo";
+  src: url({{ fonts['archivo-var-latin'] }}) format("woff2");
+  font-weight: 100 900;
+  font-stretch: 62% 125%;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Instrument Serif";
+  src: url({{ fonts['instrument-serif-italic-latin'] }}) format("woff2");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: "JetBrains Mono";
+  src: url({{ fonts['jetbrains-mono-var-latin'] }}) format("woff2");
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: swap;
+}
+/* Arrows and ⌘ aren't in the latin subsets above; this 2 KB file fills in. */
+@font-face {
+  font-family: "Arrows";
+  src: url({{ fonts['jetbrains-mono-arrows'] }}) format("woff2");
+  font-weight: 400 700;
+  unicode-range: U+2190-21FF, U+2318, U+25A0-25FF;
+  font-display: swap;
+}
+
+{{ css }}
+</style>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": "{{ site.name }}",
+  "url": "{{ site.domain }}/",
+  "jobTitle": "{{ site.role }}",
+  "email": "mailto:{{ site.email }}",
+  "alumniOf": "{{ education.institution }}",
+  "award": [{% for r in results %}"{{ r.rank_full }}, {{ r.organizer }} {{ r.event }} ({{ r.dates }})"{% if not loop.last %}, {% endif %}{% endfor %}],
+  "sameAs": ["{{ site.github }}", "{{ site.linkedin }}"]
+}
+</script>
+</head>
+
+<body>
+
+<a class="skip-link" href="#main">Skip to content</a>
+
+{% include "sections/nav.html.j2" %}
+
+<main id="main" tabindex="-1">
+{% block content %}{% endblock %}
+</main>
+
+{% include "sections/footer.html.j2" %}
+{% include "sections/palette.html.j2" %}
+
+<script>
+{{ js }}
+</script>
+
+</body>
+</html>

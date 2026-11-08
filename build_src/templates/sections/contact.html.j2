@@ -1,0 +1,43 @@
+{% import "macros.html.j2" as m %}
+<section class="section ink contact" id="contact" tabindex="-1" aria-labelledby="contact-title">
+  <div class="wrap">
+    {# The last sheet's headline *is* its title, so no separate "CONTACT"
+       heading competing with it — the meta row still names the sheet. #}
+    <header class="sec-head rv">
+      <div class="sec-meta" aria-hidden="true">
+        <span>§{{ m.nn(sec.contact) }} — Contact</span>
+        <span>Sheet {{ m.nn(sec.contact) }} / {{ m.nn(sheet_count) }}</span>
+      </div>
+      <h2 class="contact-headline" id="contact-title">{{ contact.headline_pre }} <em>{{ contact.headline_em }}</em></h2>
+    </header>
+
+    <div class="contact-grid">
+      <div class="contact-main rv">
+        <p class="contact-body">{{ contact.body }}</p>
+
+        <div class="mail-row">
+          <a class="mail-big" href="mailto:{{ site.email }}">{{ site.email }}</a>
+          <button type="button" class="btn btn-outline btn-sm" data-copy="{{ site.email }}" hidden>Copy</button>
+        </div>
+        <p class="copy-status" data-copy-status role="status" aria-live="polite"></p>
+
+        <p class="local-time">
+          <span class="label">Local time, {{ site.location }}</span>
+          <span class="clock" data-clock data-tz="{{ site.timezone }}" data-tz-label="{{ site.tz_label }}">{{ site.tz_label }} · UTC+5:30</span>
+        </p>
+      </div>
+
+      <ul class="link-rows rv">
+        {%- for l in contact.links %}
+        <li>
+          <a class="link-row" href="{{ l.href }}"{{ m.ext(l.href) }}>
+            <span class="lr-title">{{ l.title }}</span>
+            <span class="lr-note">{{ l.note }}</span>
+            <span class="lr-icon" aria-hidden="true">{{ l.icon }}</span>
+          </a>
+        </li>
+        {%- endfor %}
+      </ul>
+    </div>
+  </div>
+</section>

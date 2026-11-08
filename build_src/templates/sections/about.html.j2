@@ -1,0 +1,31 @@
+{% import "macros.html.j2" as m %}
+<section class="section" id="about" tabindex="-1" aria-labelledby="about-title">
+  <div class="wrap">
+    {{ m.sec_head(sec.about, 'about', 'About', sheet_count, 'who is drawing this') }}
+
+    <div class="about-grid">
+      <p class="about-lede rv">{{ about.lede }}</p>
+
+      <div class="about-body rv">
+        {%- for p in about.paragraphs %}
+        <p>{{ p }}</p>
+        {%- endfor %}
+      </div>
+
+      <dl class="spec rv">
+        {%- for field, value in about.spec %}
+        <div class="spec-row"><dt>{{ field }}</dt><dd>{{ value }}</dd></div>
+        {%- endfor %}
+      </dl>
+    </div>
+
+    <ul class="figures">
+      {%- for f in figures %}
+      <li class="figure rv">
+        <span class="figure-value"><span data-count="{{ f.value }}" data-suffix="{{ f.suffix }}">{{ f.value }}{{ f.suffix }}</span></span>
+        <span class="figure-label">{{ f.label }}</span>
+      </li>
+      {%- endfor %}
+    </ul>
+  </div>
+</section>

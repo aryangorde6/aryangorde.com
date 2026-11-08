@@ -1,0 +1,53 @@
+{% import "macros.html.j2" as m %}
+{# ⌘K / Ctrl-K / "/" command menu. Also the mobile menu. Never opens without
+   JS (showModal is the only way in), so it costs nothing for no-JS readers. #}
+<dialog class="palette" id="palette" aria-label="Command menu">
+  <div class="pal-search">
+    <span class="pal-prompt" aria-hidden="true">›</span>
+    <input class="pal-input" id="pal-input" type="text" role="combobox" aria-expanded="true"
+           aria-controls="pal-list" aria-autocomplete="list" aria-label="Search sections and actions"
+           placeholder="Jump to a section, or run an action…" autocomplete="off" spellcheck="false" />
+    <kbd class="kbd">Esc</kbd>
+  </div>
+  <ul class="pal-list" id="pal-list" role="listbox" aria-label="Results">
+    <li class="pal-group" role="presentation">Go to</li>
+    <li class="pal-item" role="option" id="pal-top" data-href="#top" data-keywords="home index start">
+      <span class="pal-num">00</span>Index<span class="pal-hint">↵</span></li>
+    {%- for id, label in nav %}
+    <li class="pal-item" role="option" id="pal-{{ id }}" data-href="#{{ id }}">
+      <span class="pal-num">{{ m.nn(loop.index) }}</span>{{ label }}<span class="pal-hint">↵</span></li>
+    {%- endfor %}
+    <li class="pal-item" role="option" id="pal-{{ featured.id }}" data-href="#{{ featured.id }}" data-keywords="project aws runner-up hackathon water">
+      <span class="pal-num">{{ sec.work }}.1</span>{{ featured.name }}<span class="pal-hint">↵</span></li>
+    {%- for c in cases %}
+    <li class="pal-item" role="option" id="pal-{{ c.id }}" data-href="#{{ c.id }}" data-keywords="project {{ c.tag|lower }}">
+      <span class="pal-num">{{ sec.work }}.{{ loop.index + 1 }}</span>{{ c.name }}<span class="pal-hint">↵</span></li>
+    {%- endfor %}
+    {%- for p in projects %}
+    <li class="pal-item" role="option" id="pal-{{ p.id }}" data-href="#{{ p.id }}" data-keywords="project {{ p.tag|lower }}">
+      <span class="pal-num">{{ sec.work }}.{{ loop.index + 1 + cases|length }}</span>{{ p.name }}<span class="pal-hint">↵</span></li>
+    {%- endfor %}
+    {%- for r in results %}
+    <li class="pal-item" role="option" id="pal-res-{{ r.id }}" data-href="#{{ r.id }}" data-keywords="hackathon prize award {{ r.build|lower }}">
+      <span class="pal-num">{{ sec.results }}</span>{{ r.rank_full }} — {{ r.short }}<span class="pal-hint">↵</span></li>
+    {%- endfor %}
+    {%- for u in upstream %}
+    <li class="pal-item" role="option" id="pal-{{ u.id }}" data-href="#{{ u.id }}" data-keywords="open source pull request pr merged upstream {{ u.repo|lower }}">
+      <span class="pal-num">{{ sec.results }}</span>Merged — {{ u.project }} #{{ u.number }}<span class="pal-hint">↵</span></li>
+    {%- endfor %}
+
+    <li class="pal-group" role="presentation">Do</li>
+    <li class="pal-item" role="option" id="pal-copy" data-action="copy" data-keywords="email clipboard contact">
+      <span class="pal-num">→</span>Copy email address<span class="pal-hint">{{ site.email }}</span></li>
+    <li class="pal-item" role="option" id="pal-mail" data-href="mailto:{{ site.email }}" data-keywords="email contact hire">
+      <span class="pal-num">→</span>Write an email<span class="pal-hint">↵</span></li>
+    <li class="pal-item" role="option" id="pal-resume" data-href="{{ site.resume }}" data-keywords="cv pdf download">
+      <span class="pal-num">↓</span>Open résumé (PDF)<span class="pal-hint">↵</span></li>
+    <li class="pal-item" role="option" id="pal-github" data-href="{{ site.github }}" data-external data-keywords="code source">
+      <span class="pal-num">↗</span>GitHub<span class="pal-hint">@{{ site.github_handle }}</span></li>
+    <li class="pal-item" role="option" id="pal-linkedin" data-href="{{ site.linkedin }}" data-external>
+      <span class="pal-num">↗</span>LinkedIn<span class="pal-hint">↵</span></li>
+  </ul>
+  <p class="pal-foot" aria-hidden="true"><span><kbd class="kbd">↑</kbd><kbd class="kbd">↓</kbd> move</span><span><kbd class="kbd">↵</kbd> select</span><span><kbd class="kbd">esc</kbd> close</span></p>
+  <p class="pal-empty" hidden>Nothing matches. Try “email” or “work”.</p>
+</dialog>

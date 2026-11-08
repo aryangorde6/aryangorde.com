@@ -1,0 +1,53 @@
+{# ===========================================================================
+   COMPONENT MACROS
+
+   Small, so every section draws its furniture the same way: the sheet header,
+   chips, and links that open elsewhere.
+   =========================================================================== #}
+
+{# Two-digit sheet number: 1 -> "01". #}
+{% macro nn(n) %}{{ '%02d'|format(n) }}{% endmacro %}
+
+{# The header every numbered sheet opens with:
+
+     §02 — Stack ─────────────────────────────── Sheet 02 / 05
+     STACK                          the stack, drawn as a system   #}
+{% macro sec_head(num, id, title, total, aside='') %}
+<header class="sec-head rv">
+  <div class="sec-meta" aria-hidden="true">
+    <span>§{{ nn(num) }} — {{ title }}</span>
+    <span>Sheet {{ nn(num) }} / {{ nn(total) }}</span>
+  </div>
+  <div class="sec-title-row">
+    <h2 class="sec-title" id="{{ id }}-title">{{ title }}</h2>
+    {% if aside %}<p class="sec-aside">{{ aside }}</p>{% endif %}
+  </div>
+</header>
+{% endmacro %}
+
+{% macro chips(items, extra='') %}
+<ul class="chips{% if extra %} {{ extra }}{% endif %}">
+  {%- for item in items %}<li>{{ item }}</li>{% endfor -%}
+</ul>
+{% endmacro %}
+
+{# rel/target for anything that leaves the page. #}
+{% macro ext(href) %}{% if href.startswith('http') %} target="_blank" rel="noopener"{% endif %}{% endmacro %}
+
+{# A round rubber stamp: text on a top arc and a bottom arc, a band across the
+   middle. Arcs are sized so the text clears the band at 8.5px; keep each arc
+   under ~23 characters. #}
+{% macro stamp(top, band, bottom, uid, rot) %}
+<svg class="stamp" viewBox="0 0 140 140" style="--rot: {{ rot }}deg" aria-hidden="true" focusable="false">
+  <defs>
+    <path id="st-top-{{ uid }}" d="M22 70A48 48 0 0 1 118 70" />
+    <path id="st-bot-{{ uid }}" d="M14 70A56 56 0 0 0 126 70" />
+  </defs>
+  <circle class="stamp-ring" cx="70" cy="70" r="66" />
+  <circle class="stamp-ring stamp-ring-in" cx="70" cy="70" r="42" />
+  <text class="stamp-arc"><textPath href="#st-top-{{ uid }}" startOffset="50%" text-anchor="middle">{{ top }}</textPath></text>
+  <text class="stamp-arc"><textPath href="#st-bot-{{ uid }}" startOffset="50%" text-anchor="middle">{{ bottom }}</textPath></text>
+  <rect class="stamp-band" x="4" y="57" width="132" height="26" />
+  <text class="stamp-word" x="70" y="75.5" text-anchor="middle">{{ band }}</text>
+</svg>
+{% endmacro %}

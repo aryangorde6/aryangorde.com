@@ -168,9 +168,10 @@ AWS, defined in [`infra/site.yaml`](infra/site.yaml) (CloudFormation, stack
 
 - a **private S3 bucket** in Mumbai: no public access, versioned (old versions kept 30 days);
 - **CloudFront** in front of it: HTTPS with a free ACM certificate (us-east-1), HTTP/2 and
-  HTTP/3, gzip/brotli, security headers, `www` → bare-domain 301 redirect (a CloudFront
-  Function, which also serves `/slug/` from `/slug/index.html` and sends `/slug` to
-  `/slug/`), and unknown paths answered with the "Not in this issue" page and a 404 status.
+  HTTP/3, gzip/brotli, security headers, a bare-domain → `www` 301 redirect
+  (`www.aryangorde.com` is the main address; a CloudFront Function, which also serves
+  `/slug/` from `/slug/index.html` and sends `/slug` to `/slug/`), and unknown paths answered
+  with the "Not in this issue" page and a 404 status.
 
 DNS stays at Hostinger: `@` is an ALIAS and `www` a CNAME to the distribution's
 `*.cloudfront.net` name (see [`infra/HOSTINGER_DNS.md`](infra/HOSTINGER_DNS.md)).

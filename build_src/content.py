@@ -24,7 +24,7 @@ SITE = {
     "name": "Aryan Gorde",
     "role": "Backend & full-stack developer",
     "location": "Mumbai, India",
-    "domain": "https://aryangorde.com",
+    "domain": "https://www.aryangorde.com",
     "email": "aryangorde6@gmail.com",
     "github": "https://github.com/aryangorde6",
     "github_handle": "aryangorde6",

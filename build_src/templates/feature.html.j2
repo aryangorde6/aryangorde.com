@@ -1,0 +1,133 @@
+{% extends "base.html.j2" %}
+{% import "macros.html.j2" as m %}
+{# One page per build, laid out like a magazine feature: the name set big (in
+   Devanagari when it has one), the deck, the clip, the numbers, then the story. #}
+{% block content %}
+{% set f = feature %}
+<article class="feature" aria-labelledby="f-title">
+  <header class="f-head">
+    <div class="wrap">
+      <p class="f-back"><a class="text-link" href="/#work"><span aria-hidden="true">←</span> All work</a></p>
+      <p class="chip">{{ f.kicker }}</p>
+      <h1 class="f-title" id="f-title">{{ m.name(f) }}</h1>
+      {% if f.get('gloss') %}<p class="gloss">“{{ f.gloss }}”</p>{% endif %}
+      <p class="f-dek">{{ f.dek }}</p>
+      {% set links = ([f.live] if f.get('live') else []) + f.links %}
+      {{ m.buttons(links) }}
+    </div>
+  </header>
+
+  {% if f.get('video') %}
+  <figure class="f-video wrap">
+    {{ m.loop(videos[f.video], f.video_caption, eager=True) }}
+    <figcaption class="cap cap-dark">{{ f.video_caption }}</figcaption>
+  </figure>
+  {% endif %}
+
+  <div class="wrap">
+    <ul class="f-figs">
+      {%- for fig in f.figures %}
+      <li><b>{{ fig.value }}</b><span>{{ fig.note }}</span></li>
+      {%- endfor %}
+    </ul>
+
+    {% if f.get('demo') == 'tripwire' %}
+    {% include "sections/demo_tripwire.html.j2" %}
+    {% endif %}
+
+    {% if f.get('quote') %}
+    <blockquote class="f-quote">
+      <p>{{ f.quote[0] }} <mark>{{ f.quote[1] }}</mark></p>
+      <footer>{{ f.quote_note }}</footer>
+    </blockquote>
+    {% endif %}
+
+    {% if f.get('flow') %}
+    <figure class="flow">
+      <h2 class="fig-title">{{ f.flow_title }}</h2>
+      <ol class="flow-steps">
+        {%- for label, sub in f.flow %}
+        <li><b>{{ label }}</b><span>{{ sub }}</span></li>
+        {%- endfor %}
+      </ol>
+      <figcaption class="cap cap-dark">{{ f.flow_caption }}</figcaption>
+    </figure>
+    {% endif %}
+
+    {% if f.get('timeline') %}
+    {% set tl = f.timeline %}
+    {# Drawn to scale: every event sits at its second on the axis. Below 1100px
+       it reads as a plain list, top to bottom. #}
+    <figure class="tl">
+      <h2 class="fig-title">{{ tl.title }}</h2>
+      <div class="tl-plot" style="--span: {{ tl.span }}">
+        <ol class="tl-events">
+          {%- for e in tl.events %}
+          <li class="tl-ev tl-{{ e.lane }} tl-row-{{ e.row }}{% if e.get('kind') %} tl-{{ e.kind }}{% endif %}{% if e.t / tl.span > 0.6 %} tl-flip{% endif %}" style="--t: {{ e.t }}">
+            <span class="tl-time">{{ e.time }} · {{ 'Caller' if e.lane == 'caller' else f.name }}</span>
+            <span class="tl-what">{{ e.what }}</span>
+            {%- if e.get('note') %}<span class="tl-note">{{ e.note }}</span>{% endif %}
+          </li>
+          {%- endfor %}
+        </ol>
+        <div class="tl-axis" aria-hidden="true">
+          {%- for s in range(0, tl.span + 1, 10) %}<span class="tl-tick" style="--t: {{ s }}">{{ s }} s</span>{% endfor -%}
+        </div>
+        {%- for d in tl.dims %}
+        <span class="tl-dim" style="--a: {{ d.a }}; --b: {{ d.b }}" aria-hidden="true"><span>{{ d.label }}</span></span>
+        {%- endfor %}
+      </div>
+      <figcaption class="cap cap-dark">{{ tl.caption }}</figcaption>
+    </figure>
+    {% endif %}
+
+    {% if f.get('chain') %}
+    {% set ch = f.chain %}
+    <figure class="chain">
+      <h2 class="fig-title">{{ ch.title }}</h2>
+      <ol class="ch-row">
+        {%- for node in ch.nodes %}
+        <li class="ch-node{% if loop.first %} ch-root{% endif %}{% if loop.last %} ch-end{% endif %}">
+          <b>{{ node[0] }}</b><span class="ch-risk">risk {{ node[1] }}</span>
+          {%- if loop.last %}<span class="ch-verdict">{{ ch.verdict }}</span>{% endif %}
+        </li>
+        {%- if not loop.last %}{% set l = ch.links[loop.index0] %}
+        <li class="ch-link"><span class="ch-cls">{{ l[0] }} <b>{{ l[1] }}</b></span><span class="ch-why">{{ l[2] }}</span></li>
+        {%- endif %}
+        {%- endfor %}
+      </ol>
+      {% set b = ch.branch %}
+      <p class="ch-from">Another paper citing {{ ch.nodes[1][0] }}:</p>
+      <div class="ch-row ch-branch">
+        <p class="ch-node ch-ghost"><b>{{ ch.nodes[1][0] }}</b><span class="ch-risk">risk {{ ch.nodes[1][1] }}</span></p>
+        <p class="ch-link"><span class="ch-cls">{{ b[0][0] }} <b>{{ b[0][1] }}</b></span><span class="ch-why">{{ b[0][2] }}</span></p>
+        <p class="ch-node ch-weak"><b>{{ b[1][0] }}</b><span class="ch-risk">risk {{ b[1][1] }}</span><span class="ch-verdict">{{ b[2] }}</span></p>
+      </div>
+      <p class="ch-rule">{{ ch.rule }}</p>
+      <figcaption class="cap cap-dark">{{ ch.caption }}</figcaption>
+    </figure>
+    {% endif %}
+
+    <div class="f-body">
+      {%- for title, text in f.detail %}
+      <section class="f-sec" aria-labelledby="d-{{ loop.index }}">
+        <h2 id="d-{{ loop.index }}">{{ title }}</h2>
+        <p>{{ text }}</p>
+      </section>
+      {%- endfor %}
+    </div>
+
+    <div class="f-foot">
+      <p class="f-tech"><span class="label">Built with</span> {{ f.tech|join(' · ') }}</p>
+      {{ m.buttons(links) }}
+    </div>
+
+    {% set nxt = features[(feature_index + 1) % features|length] %}
+    <a class="next" href="/{{ nxt.slug }}/">
+      <span class="label">Next feature</span>
+      {{ m.name(nxt) }}
+      <span class="arr" aria-hidden="true">→</span>
+    </a>
+  </div>
+</article>
+{% endblock %}

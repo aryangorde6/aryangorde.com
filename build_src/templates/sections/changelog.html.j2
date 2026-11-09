@@ -1,47 +1,41 @@
 {% import "macros.html.j2" as m %}
-<section class="section" id="changelog" tabindex="-1" aria-labelledby="changelog-title">
+<section class="section paper" id="changelog" aria-labelledby="changelog-title">
   <div class="wrap">
-    {{ m.sec_head(sec.changelog, 'changelog', 'Changelog', sheet_count, 'shipped work, newest first') }}
-
-    <p class="sec-intro rv">Final-year computer engineering student, so no employment history yet —
-      what follows is shipped, dated work.</p>
-
+    {{ m.sec_head('changelog', 'Everything shipped', 'Final-year student, so no employment history yet. This is dated, shipped work, newest first.') }}
     <div class="log-grid">
       <ol class="log">
         {%- for e in changelog %}
-        <li class="log-entry rv">
+        <li class="log-row">
           <p class="log-date">{{ e.period }}</p>
           <div class="log-body">
-            <p class="log-context"><span class="label">{{ e.context }}</span>{% if e.get('prize') %}<span class="log-prize">{{ e.prize }}</span>{% endif %}</p>
-            <h3 class="log-name">{{ e.name }}</h3>
+            <h3 class="log-name">{% if e.get('hindi') %}<span class="log-hi" lang="hi">{{ e.hindi }}</span> {% endif %}{{ e.name }}{% if e.get('prize') %} <span class="chip chip-ink">{{ e.prize }}</span>{% endif %}</h3>
+            <p class="log-ctx">{{ e.context }}</p>
             <p class="log-detail">{{ e.detail }}</p>
-            {{ m.chips(e.tech) }}
-            {% if e.anchor or e.get('links') %}
+            <p class="log-tech">{{ e.tech|join(' · ') }}</p>
+            {%- if e.get('href') or e.get('links') %}
             <p class="log-links">
-              {%- if e.anchor %}<a class="text-link" href="#{{ e.anchor }}">{{ 'The result' if e.anchor in ['rote'] else 'Read the write-up' }} <span aria-hidden="true">↑</span></a>{% endif %}
-              {%- for l in e.get('links', []) %}<a class="text-link" href="{{ l.href }}"{{ m.ext(l.href) }}>{{ l.label }} <span aria-hidden="true">↗</span></a>{% endfor %}
+              {%- if e.get('href') %}<a class="text-link" href="{{ e.href }}">{{ 'The prize' if e.href.startswith('#') else 'Read the feature' }} {{ m.arr(e.href) }}</a>{% endif %}
+              {%- for l in e.get('links', []) %}<a class="text-link" href="{{ l.href }}"{{ m.ext(l.href) }}>{{ l.label }} {{ m.arr(l.href) }}</a>{% endfor %}
             </p>
-            {% endif %}
+            {%- endif %}
           </div>
         </li>
         {%- endfor %}
       </ol>
 
       <aside class="log-side" aria-label="Education and certifications">
-        <div class="card rv">
-          <p class="label">Education · {{ education.status }}</p>
-          <h3 class="card-title">{{ education.degree }}</h3>
-          <p class="card-strong">{{ education.institution }}</p>
-          <p class="card-muted">{{ education.affiliation }}</p>
-          <p class="card-text">{{ education.detail }}</p>
+        <div class="side-block">
+          <h3 class="side-head">Education</h3>
+          <p class="side-strong">{{ education.degree }}</p>
+          <p>{{ education.institution }}</p>
+          <p class="side-dim">{{ education.affiliation }} · {{ education.status }}</p>
+          <p class="side-text">{{ education.detail }}</p>
         </div>
-
-        <div class="card rv">
-          <p class="label">{{ certifications|length }} completed</p>
-          <h3 class="card-title">Certifications</h3>
+        <div class="side-block">
+          <h3 class="side-head">Certifications</h3>
           <ul class="certs">
             {%- for name, issuer, date in certifications %}
-            <li><span class="cert-name">{{ name }}</span><span class="cert-meta">{{ issuer }} · {{ date }}</span></li>
+            <li><b>{{ name }}</b><span>{{ issuer }} · {{ date }}</span></li>
             {%- endfor %}
           </ul>
         </div>

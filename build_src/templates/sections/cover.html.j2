@@ -1,0 +1,37 @@
+{# The cover: the name set huge over a colour portrait, three cover lines, the deck. #}
+<section class="cover" id="top" aria-labelledby="cover-title">
+  <div class="cover-photo" aria-hidden="true">
+    <picture>
+      <source type="image/webp" srcset="{{ photo.webp_srcset }}" sizes="(min-width: 900px) 52vw, 100vw" />
+      <img src="/{{ photo.fallback }}" srcset="{{ photo.jpg_srcset }}" sizes="(min-width: 900px) 52vw, 100vw"
+           alt="" width="{{ photo.width }}" height="{{ photo.height }}" fetchpriority="high" decoding="async" />
+    </picture>
+  </div>
+  <div class="cover-fade" aria-hidden="true"></div>
+
+  <div class="wrap cover-body">
+    <h1 class="cover-name" id="cover-title">
+      <span class="cn-1">{{ hero.first_name }}</span>
+      <span class="cn-2">{{ hero.last_name }}</span>
+      <span class="visually-hidden">, {{ site.role|lower }}</span>
+    </h1>
+
+    <ul class="cover-lines">
+      {%- for l in hero.lines %}
+      <li class="cl">
+        <a class="cl-link" href="{{ l.href }}">
+          <span class="chip">{{ l.chip }}</span>
+          <span class="cl-head">{{ l.head }}</span>
+          <span class="cl-text">{{ l.text }}</span>
+        </a>
+      </li>
+      {%- endfor %}
+    </ul>
+
+    <p class="cover-deck">{{ hero.deck }}</p>
+    <p class="cover-actions">
+      <a class="btn btn-solid" href="#work">Read the four builds <span class="arr" aria-hidden="true">↓</span></a>
+      <a class="text-link" href="mailto:{{ site.email }}">{{ site.email }}</a>
+    </p>
+  </div>
+</section>

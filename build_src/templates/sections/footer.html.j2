@@ -1,28 +1,13 @@
-{% import "macros.html.j2" as m %}
-{# The title block every engineering drawing carries in its corner, here
-   stretched across the foot of the page. #}
-<footer class="footer ink">
-  <div class="wrap">
-    <div class="tb">
-      <div class="tb-cell tb-main">
-        <span class="label">Drawing</span>
-        <span class="tb-title">{{ site.name }} — Portfolio</span>
-      </div>
-      <div class="tb-cell"><span class="label">Drawn by</span><span class="tb-val">A. Gorde</span></div>
-      <div class="tb-cell"><span class="label">Sheets</span><span class="tb-val">{{ m.nn(sheet_count + 1) }}</span></div>
-      <div class="tb-cell"><span class="label">Scale</span><span class="tb-val">1 : 1</span></div>
-      <div class="tb-cell"><span class="label">©</span><span class="tb-val" id="year">{{ year }}</span></div>
-      <a class="tb-cell tb-top" href="#top"><span class="label">Return</span><span class="tb-val">Top <span aria-hidden="true">↑</span></span></a>
-    </div>
-
-    <div class="foot-row">
-      <p class="colophon">{{ colophon }}</p>
-      <p class="foot-links">
-        <a href="mailto:{{ site.email }}">Email</a>
-        <a href="{{ site.github }}" target="_blank" rel="noopener">GitHub</a>
-        <a href="{{ site.linkedin }}" target="_blank" rel="noopener">LinkedIn</a>
-        <a href="{{ site.resume }}">Résumé</a>
-      </p>
-    </div>
+<footer class="footer">
+  <div class="wrap foot-grid">
+    <p class="foot-name">{{ site.name }}</p>
+    <p class="foot-links">
+      <a href="mailto:{{ site.email }}">Email</a>
+      <a href="{{ site.github }}" target="_blank" rel="noopener">GitHub</a>
+      <a href="{{ site.linkedin }}" target="_blank" rel="noopener">LinkedIn</a>
+      <a href="{{ site.resume }}">Résumé</a>
+    </p>
+    <p class="colophon">{{ colophon }}</p>
+    <p class="foot-copy">© {{ year }} {{ site.name }} · {{ site.location }}</p>
   </div>
 </footer>

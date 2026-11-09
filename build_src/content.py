@@ -2,18 +2,20 @@
 Every word on the site lives here.
 
 Editing content should never mean editing markup. Add a build by appending a
-dict to CHANGELOG; add a tool by appending a string to a STACK node. The
-templates loop over these, so the page rebuilds around whatever you put in.
+dict to CHANGELOG; add a feature page by appending a dict to FEATURES. The
+templates loop over these, so the pages rebuild around whatever you put in.
 
-House rule (from the résumé accuracy pass): every claim on this page has to be
-traceable to Aryan_Gorde_Resume.pdf, to Aryan's own hackathon records
-(~/rote_hack/HACKATHON-HANDOFF.md and each project's README/overview), or to
-the live app it describes. If you can't point at where a line came from,
-don't add it. Diagrams on the page are
-drawn as *schematics* and say so — they never carry invented numbers.
+House rule: every claim on this site has to trace to a source: each project's
+README on github.com/aryangorde6, Aryan's hackathon records (the STATE.md and
+handoff files in each hackathon folder), the pull requests themselves, the
+organisers' winners graphics, or the live app. If you can't point at where a
+line came from, don't add it. Schematic drawings say they are schematic.
 
-Inline markup is allowed in the prose fields. Wrap a word in <em> to set it in
-the italic serif accent face.
+Inline markup is allowed in prose fields: <b>, <code>, and <mark> (the yellow
+highlighter, used sparingly).
+
+Writing: plain sentences. No em dashes in copy; use a colon, a comma, brackets
+or a full stop.
 """
 
 # --- identity ---------------------------------------------------------------
@@ -22,61 +24,56 @@ SITE = {
     "name": "Aryan Gorde",
     "role": "Backend & full-stack developer",
     "location": "Mumbai, India",
-    "timezone": "Asia/Kolkata",     # drives the live local-time readout
-    "tz_label": "IST",
     "domain": "https://aryangorde.com",
     "email": "aryangorde6@gmail.com",
     "github": "https://github.com/aryangorde6",
     "github_handle": "aryangorde6",
     "linkedin": "https://www.linkedin.com/in/aryan-gorde-6b660a264/",
     "resume": "/Aryan_Gorde_Resume.pdf",
-    "title": "Aryan Gorde — Backend & Full-Stack Developer",
+    "title": "Aryan Gorde · Backend and full-stack developer",
     "description": (
-        "Aryan Gorde — backend and full-stack developer. Runner-up at the WeMakeDevs × "
-        "AWS Environmental Hacks and a winner (3rd place) at the Rote Playoffs Hackathon in 2026, with fixes merged "
-        "into NumPy and Pillow. Python, AWS, and AI only where code can check it."
+        "Aryan Gorde, backend and full-stack developer in Mumbai. Runner-up at the WeMakeDevs × "
+        "AWS Environmental Hacks and a winner (3rd place) at the Rote Playoffs Hackathon in 2026, "
+        "with fixes merged into NumPy and Pillow. Python, AWS, and AI only where code can check it."
     ),
-    "og_description": (
-        "Backends that have to be right, and the proof that they are — drawn as a system."
-    ),
+    "og_description": "Backends that have to be right, and the proof that they are.",
     "photo": "aryan.jpg",          # source file in build_src/images/
     "photo_alt": "Portrait of Aryan Gorde",
-    "status": "Open to backend & full-stack roles",
 }
 
 # --- nav --------------------------------------------------------------------
-# (id, label) — id must match a section id, and build.py verifies that. The
-# order here is also the §-number each section is drawn with.
+# (id, label). Each id must be a <section id> on the home page; build.py checks.
 
 NAV = [
-    ("about",     "About"),
-    ("results",   "Results"),
-    ("stack",     "Stack"),
-    ("work",      "Work"),
-    ("changelog", "Changelog"),
-    ("contact",   "Contact"),
+    ("work",        "Work"),
+    ("prizes",      "Prizes"),
+    ("open-source", "Open source"),
+    ("about",       "About"),
+    ("contact",     "Contact"),
 ]
 
-# --- hero -------------------------------------------------------------------
+# --- the cover ----------------------------------------------------------------
 
 HERO = {
     "first_name": "Aryan",
     "last_name": "Gorde",
-    "kicker": "Backend & full-stack developer",
-    "blurb": (
-        "I build the parts of a product that have to be <em>right</em> — warnings "
-        "that quote the caller's own words, a tripwire that fails closed, tests frozen "
-        "before the first result. Python on the server, AWS around it, and AI only "
+    # Three cover lines: a yellow chip, a headline, one sentence. Each links to
+    # the part of the page that proves it.
+    "lines": [
+        {"chip": "Runner-up", "head": "Environmental Hacks", "href": "#env-hacks",
+         "text": "WeMakeDevs × AWS. One of 4 runners-up out of 9,146 registered, solo, "
+                 "with Teesri Shikayat."},
+        {"chip": "Winner · 3rd place", "head": "Rote Playoffs Hackathon", "href": "#rote",
+         "text": "WeMakeDevs × Modiqo. Found the runtime silently cutting output at 64 KiB; "
+                 "fixed upstream."},
+        {"chip": "Merged", "head": "NumPy and Pillow", "href": "#open-source",
+         "text": "Two fixes accepted upstream. Pillow's shipped in 13.0.0."},
+    ],
+    "deck": (
+        "Backend and full-stack developer. I build the parts of a product that "
+        "<mark>have to be right</mark>: Python on the server, AWS around it, and AI only "
         "where code can check its work."
     ),
-    # The drawing's title block — the box in the corner of every engineering
-    # sheet. Each row is (field, value); all of it is checkable elsewhere.
-    "title_block": [
-        ("Drawn by",  "A. Gorde"),
-        ("Discipline", "Backend · Full-stack"),
-        ("Studying",  "B.Tech CE · SPIT '27"),
-        ("Based in",  "Mumbai, IN"),
-    ],
 }
 
 # --- about ------------------------------------------------------------------
@@ -85,25 +82,24 @@ ABOUT = {
     "lede": "Server-side by preference, full-stack by necessity.",
     "paragraphs": [
         "I'm a computer engineering student who wandered onto the server side and never "
-        "left. The work I like has a correct answer buried in it somewhere — a warning "
-        "that has to quote what the caller actually said, a tripwire that fires on the "
-        "third complaint and not the second, a chain of citations whose risk has to add up.",
+        "left. The work I like has a correct answer buried in it somewhere: a warning that "
+        "has to quote what the caller actually said, a tripwire that fires on the third "
+        "complaint and not the second, a chain of citations whose risk has to add up.",
 
         "Most of what I ship is Python, event-driven on AWS more often than not, with a "
         "small, sharp frontend on top. I'd rather spend the afternoon on the evaluation "
-        "than the hover state. (This page is what happens when I get to do both.)",
+        "than the hover state. (This site is what happens when I get to do both.)",
     ],
-    # Spec sheet rows: (field, value)
     "spec": [
-        ("Currently", "B.Tech, Computer Engineering"),
-        ("Latest",    "Jaisa Kaha · Nov 2026"),
+        ("Studying",  "B.Tech, Computer Engineering, SPIT (2027)"),
+        ("Latest",    "Jaisa Kaha, Nov 2026"),
         ("Learning",  "Distributed systems"),
-        ("Status",    "Available"),
+        ("Based in",  "Mumbai"),
     ],
 }
 
-# Figures shown on the about sheet. Every one is checkable against the page,
-# and build.py fails if a figure with a `check` key drifts from what it counts.
+# Figures on the about spread. build.py fails if a figure with a `check` key
+# drifts from what it counts.
 FIGURES = [
     {"value": 9, "suffix": "",  "label": "builds shipped in 2026", "check": "changelog_2026"},
     {"value": 2, "suffix": "",  "label": "hackathon prizes, solo", "check": "results"},
@@ -111,14 +107,10 @@ FIGURES = [
     {"value": 3, "suffix": "+", "label": "years on Python"},
 ]
 
-# --- results (hackathons) ---------------------------------------------------
-# Source: ~/rote_hack/HACKATHON-HANDOFF.md §1, §2, §10. Placed entries only.
-# `stamp` is drawn as a rubber stamp: (top arc, centre band, bottom arc). Room, measured
-# in the browser (viewBox units): top arc ≤ 124, bottom arc ≤ 150, band ≤ 132 —
-# about 21 / 26 / 11 characters. Longer text runs under the band or off the arc.
-# `rank_lead` goes on the line above the rank. Rote: WeMakeDevs titles its graphic
-# "Hackathon Winners" (1st–3rd, above two runner-ups), so 3rd place is a winner.
-# Never "winner" without the place next to it; Environmental Hacks stays "Runner-up".
+# --- prizes -------------------------------------------------------------------
+# Placed entries only. Wording rule: Rote is "Winner · 3rd place" (WeMakeDevs titles
+# its graphic "Hackathon Winners", 1st to 3rd, above two runner-ups). Never "winner"
+# without the place next to it. Environmental Hacks is always "Runner-up".
 
 RESULTS = [
     {
@@ -127,7 +119,7 @@ RESULTS = [
         "event": "Environmental Hacks",
         "organizer": "WeMakeDevs × AWS · Bharat Builds Tour, event 02",
         "dates": "8–11 Oct 2026",
-        "field": "9,146 registered · one of 4 runners-up across all three tracks",
+        "field": "9,146 registered. One of 4 runners-up across all three tracks.",
         "track": "Heat and Water",
         "prize": "$1,000 AWS credits",
         "team": "Solo",
@@ -138,26 +130,14 @@ RESULTS = [
             "the residents can close the case."
         ),
         "links": [
-            {"label": "Case study", "href": "#teesri"},
+            {"label": "Read the feature", "href": "/teesri-shikayat/"},
             {"label": "Demo video", "href": "https://youtu.be/L0UteWpltyw"},
         ],
-        "short": "AWS Environmental Hacks",
-        # The hero plate: the one-line version of this card.
-        "plate": {
-            "month": "Oct 2026",
-            "org": "WeMakeDevs × AWS",
-            "field": "9,146 registered",
-            "what": "Built Teesri Shikayat",
-            "href": "#teesri",
-        },
-        "stamp": ("Environmental Hacks", "Runner-up", "WeMakeDevs × AWS · 2026"),
-        "rot": -7,
         # Crops of the organisers' runner-ups graphic: its header and Aryan's own
-        # card only — the other teams' photos are left out (shown as a break line).
+        # card only. The other teams' photos are left out (shown as a break line).
         "proof": {
             "caption": "From the official WeMakeDevs × AWS runner-ups graphic. "
                        "The other three teams are cut at the break.",
-            # WeMakeDevs' own announcement post, checked 08 Nov 2026.
             "post": "https://www.linkedin.com/posts/the-environmental-hacks-runner-ups-are-here-share-7518274243164381184-WOrW/",
             "parts": [
                 {"name": "env-head", "alt": "WeMakeDevs × AWS graphic: Bharat Builds event 02, "
@@ -171,44 +151,29 @@ RESULTS = [
         "rank_lead": "Winner",
         "rank": "3rd place",
         # "Hackathon" in the name: "Playoffs" alone reads like sport (WeMakeDevs' post:
-        # "The Rote Playoffs hackathon winners are…"). Stamp says "Rote Playoffs Hack" (arc room).
+        # "The Rote Playoffs hackathon winners are…").
         "event": "Rote Playoffs Hackathon",
         "organizer": "WeMakeDevs × Modiqo",
         "dates": "1–6 Sep 2026",
-        "field": "of ~900 published plays",
+        "field": "Of ~900 published plays.",
         "track": "Open",
         "prize": "iPhone 17",
         "team": "Solo",
-        "build": "Four plays + one platform defect",
+        "build": "Four plays and one platform defect",
         "summary": (
             "four read-only GitHub plays for Modiqo's Rote registry, and the finding that "
             "carried them: the runtime silently kept only the first 64 KiB of a step's "
             "output and still reported success. 221 of the 249 public plays that read "
             "that output (89%) never checked. Filed upstream; fixed in rote v0.83.0."
         ),
+        "demo": "truncation",
         "links": [
             {"label": "Write-up", "href": "https://aryangorde6.github.io/rote-stdout-truncation/"},
             {"label": "Upstream issue", "href": "https://github.com/modiqo/rote-releases/issues/10"},
         ],
-        "short": "Rote Playoffs Hackathon",
-        "plate": {
-            "month": "Sep 2026",
-            "org": "WeMakeDevs × Modiqo",
-            "field": "~900 published plays",
-            "what": "Found a 64 KiB output bug, fixed upstream",
-            "href": "#rote",
-        },
-        # Band "Winner" like Env Hacks' "Runner-up". Top arc "Rote Playoffs Hack" (Aryan,
-        # 08 Nov; the full "…Hackathon" is too long for the arc). No year: there has only
-        # been one Rote Playoffs. Both organisers stay on the bottom arc;
-        # "3rd place · WeMakeDevs × Modiqo" is too long for it, so the place is carried
-        # by the big rank text right beside the stamp.
-        "stamp": ("Rote Playoffs Hack", "Winner", "WeMakeDevs × Modiqo"),
-        "rot": 6,
         "proof": {
             "caption": "From the official WeMakeDevs × Modiqo winners graphic. "
                        "The other winners are cut at the break.",
-            # WeMakeDevs' own announcement post, checked 08 Nov 2026.
             "post": "https://www.linkedin.com/posts/the-rote-playoffs-hackathon-winners-are-share-7505295266309132288-6Rjf/",
             "parts": [
                 {"name": "rote-head", "alt": "WeMakeDevs × Modiqo graphic: Rote Playoffs hackathon winners."},
@@ -217,13 +182,24 @@ RESULTS = [
         },
     },
 ]
-# One-line rank, e.g. "Winner · 3rd place" (command palette, structured data).
+# One-line rank, e.g. "Winner · 3rd place" (structured data, chips).
 for _r in RESULTS:
     _r["rank_full"] = " · ".join(x for x in (_r.get("rank_lead"), _r["rank"]) if x)
 
-# Fixes merged into other people's projects. Source: the PRs themselves
-# (gh pr view) and Pillow 13.0.0's release notes, checked 08 Nov 2026. NumPy has
-# not released since the merge, so it claims "merged into main" and no more.
+# The 64 KiB slider on the Rote spread. Numbers from ~/rote_hack/HACKATHON-HANDOFF.md
+# and the write-up: output past 64 KiB was dropped while the step still reported
+# success; 221 of the 249 registry plays that read step output never checked.
+TRUNCATION = {
+    "limit_kib": 64,
+    "max_kib": 256,
+    "start_kib": 120,   # past the limit, so the page shows a loss before any script runs
+    "plays_reading": 249,
+    "plays_unchecked": 221,
+}
+
+# Fixes merged into other people's projects. Source: the PRs (gh pr view) and
+# Pillow 13.0.0's release notes, checked 08 Nov 2026. NumPy has not released
+# since the merge, so it claims "merged into main" and no more.
 UPSTREAM = [
     {
         "id": "pr-numpy",
@@ -233,7 +209,7 @@ UPSTREAM = [
         "title": "BUG: close the file in np.load when an .npz is invalid",
         "summary": (
             "<code>np.load</code> left the file open when handed a broken <code>.npz</code> "
-            "— an interrupted download, say — and Python warned about an unclosed file. "
+            "(an interrupted download, say), and Python warned about an unclosed file. "
             "The file is now handed over only once the archive has opened, so a failure "
             "closes it. With a regression test."
         ),
@@ -257,171 +233,154 @@ UPSTREAM = [
         "merged": "10 Oct 2026",
         "diff": "+30 −3 · 3 files",
         "status": "Shipped in Pillow 13.0.0",
-        "release": "13.0.0",
         "href": "https://github.com/python-pillow/Pillow/pull/10147",
     },
 ]
 
-# Every other hackathon entered in 2026, newest first. Outcome says only what
-# is known: "Submitted" means submitted, nothing more is claimed.
+# Every other hackathon entered in 2026, newest first. Outcome says only what is
+# known: "Submitted" means submitted, nothing more is claimed.
 ENTRIES = [
     {"when": "Nov 2026", "event": "Flip the Switch", "organizer": "WeMakeDevs × DevTools Academy × Switch",
-     "build": "Jaisa Kaha — an AI scribe that won't invent a cook's quantities",
+     "build": "Jaisa Kaha", "what": "an AI scribe that won't invent a cook's quantities",
      "outcome": "Submitted · Track 02"},
     {"when": "Nov 2026", "event": "Global AI Developer Hackathon", "organizer": "Meta",
-     "build": "Teesra Kaan — warns on a scam call and shows the caller's next line",
+     "build": "Teesra Kaan", "what": "warns on a scam call and shows the caller's next line",
      "outcome": "Submitted · Indie track"},
     {"when": "Oct 2026", "event": "Graph Hacks", "organizer": "WeMakeDevs × FalkorDB",
-     "build": "Shaky Ground — finds the science built on retracted research",
+     "build": "Shaky Ground", "what": "finds the science built on retracted research",
      "outcome": "Submitted · Track 01"},
     {"when": "Oct 2026", "event": "Dark Factory", "organizer": "WeAreDevelopers × Band",
-     "build": "The Adversary Line — five coding-agent seats building and attacking a reservation service",
+     "build": "The Adversary Line", "what": "five coding-agent seats building and attacking a reservation service",
      "outcome": "Submitted"},
     {"when": "Sep 2026", "event": "IBM Bob 2.0 Hackathon", "organizer": "lablab.ai × IBM",
-     "build": "Antibody — checks that fixed bugs stay fixed (team of 2)",
+     "build": "Antibody", "what": "checks that fixed bugs stay fixed (team of 2)",
      "outcome": "Submitted"},
     {"when": "Sep 2026", "event": "First Commit", "organizer": "WeMakeDevs × AWS",
-     "build": "Pukaar — one press pages the three people most likely to answer, at once",
+     "build": "Pukaar", "what": "one press pages the three people most likely to answer, at once",
      "outcome": "Submitted · 13,664 registered"},
     {"when": "Sep 2026", "event": "AI Trading Agents Hackathon", "organizer": "lablab.ai × Alpaca",
-     "build": "Contour — an options agent that sells only the rich side of the skew",
+     "build": "Contour", "what": "an options agent that sells only the rich side of the skew",
      "outcome": "Submitted"},
 ]
 
-# --- stack (drawn as a system diagram) --------------------------------------
-# Each node is a box in the diagram. `x`, `y`, `w` place it on the desktop
-# drawing (in a 1200 × 660 coordinate space); below ~1100px the drawing
-# reflows into a simple vertical flow and those numbers are ignored.
-# `edges` are drawn from this node to the named nodes. Connectors attach at
-# each node's title bar, so a node can grow taller without breaking the lines.
+# --- stack ------------------------------------------------------------------
+# The tools, by the hop where they do their job in a request.
 
-STACK_NODES = [
-    {"id": "client", "label": "Client", "x": 24, "y": 238, "w": 236,
-     "note": "Enough frontend to ship the whole thing solo.",
-     "items": ["React", "Next.js", "Tailwind", "Chart.js", "Vanilla JS"],
-     "edges": ["edge"]},
-
-    {"id": "edge", "label": "Edge", "x": 330, "y": 238, "w": 170,
-     "note": "Off the laptop, and staying up.",
-     "items": ["Nginx", "Gunicorn"],
-     "edges": ["app"]},
-
-    {"id": "app", "label": "Application", "x": 566, "y": 238, "w": 244,
-     "note": "Where most of the time goes.",
-     "items": ["Django", "DRF", "FastAPI", "Express", "Node.js"],
-     "edges": ["data", "async", "ai"]},
-
-    {"id": "data", "label": "Data", "x": 876, "y": 50, "w": 300,
-     "note": "Storage, cache, and the queries between.",
-     "items": ["PostgreSQL", "MongoDB Atlas", "Redis", "SQLite", "ChromaDB"],
-     "edges": []},
-
-    {"id": "async", "label": "Async", "x": 876, "y": 250, "w": 300,
-     "note": "Work that shouldn't block a request.",
-     "items": ["Celery", "Redis"],
-     "edges": []},
-
-    {"id": "ai", "label": "AI", "x": 876, "y": 416, "w": 300,
-     "note": "Used where it earns its latency.",
-     "items": ["Groq · Llama 3.3", "Vertex AI · Gemini", "Amazon Bedrock", "Ollama",
-               "Hybrid retrieval"],
-     "edges": []},
+STACK = [
+    {"label": "Client", "note": "Enough frontend to ship the whole thing solo.",
+     "items": ["React", "Next.js", "Tailwind", "Chart.js", "Vanilla JS"]},
+    {"label": "Edge", "note": "Off the laptop, and staying up.",
+     "items": ["Nginx", "Gunicorn"]},
+    {"label": "Application", "note": "Where most of the time goes.",
+     "items": ["Django", "DRF", "FastAPI", "Express", "Node.js"]},
+    {"label": "Data", "note": "Storage, cache, and the queries between.",
+     "items": ["PostgreSQL", "MongoDB Atlas", "Redis", "SQLite", "ChromaDB"]},
+    {"label": "Async", "note": "Work that shouldn't block a request.",
+     "items": ["Celery", "Redis"]},
+    {"label": "AI", "note": "Used where it earns its latency.",
+     "items": ["Groq · Llama 3.3", "Vertex AI · Gemini", "Amazon Bedrock", "Ollama", "Hybrid retrieval"]},
+    {"label": "Runtime", "note": "Where it all runs.",
+     "items": ["Docker", "AWS EC2", "Cloud Run"]},
+    {"label": "CI / CD", "note": "Tests on every push; main deploys on green.",
+     "items": ["GitHub Actions", "Jenkins"]},
 ]
-
-# The dashed boundary drawn around everything server-side.
-STACK_BOUNDARY = {
-    "label": "Runtime",
-    "items": ["Docker", "AWS EC2", "Cloud Run"],
-}
-
-# The lane under the drawing that ships into the boundary.
-STACK_CI = {
-    "label": "CI / CD",
-    "note": "Tests on every push; main deploys on green.",
-    "items": ["GitHub Actions", "Jenkins"],
-}
 
 LANGUAGES = ["Python", "TypeScript", "JavaScript", "SQL", "Bash", "C"]
 
-# --- work: featured case study ----------------------------------------------
-# Source: ~/teesri-shikayat/README.md and HACKATHON-HANDOFF.md §10.2. The ring
-# figure is a schematic of the recorded demo incident (simulated homes).
+# --- features: one page each ----------------------------------------------------
+# Only projects on github.com/aryangorde6 (Aryan, 08 Nov 2026). Sources: each repo's
+# README (fetched 08 Nov 2026) and the hackathon STATE files.
+#   slug     the page lives at /<slug>/
+#   hindi    the Devanagari name, set big in the headline. Every character used here
+#            must be in fonts/anek-devanagari-names.woff2 (a subset): build.py checks.
+#   gloss    what the name means, from the project's own README or summary
+#   video    a silent 8 s loop cut from Aryan's own demo recording (build_src/video/)
+#   demo     an interactive figure drawn by the template ("tripwire")
+#   teaser   the line under the name on the home page
 
-FEATURED = {
-    "id": "teesri",
-    "name": "Teesri Shikayat",
-    "gloss": "“the third complaint”",
-    "tag": "Featured build · Runner-up, AWS Environmental Hacks",
-    "summary": (
-        "A tripwire for dirty tap water, from my own monsoon tap in Mumbai. Residents "
-        "complain with a Hindi voice note on Telegram. When three different homes within "
-        "250 m report dirty water inside 72 hours, every enrolled home in the ring is "
-        "warned in Hindi — and only the residents can close the case."
-    ),
-    "figures": [
-        {"value": "20/23", "note": "homes warned in the demo incident had never complained."},
-        {"value": "₹0.94", "note": "measured AWS cost of one real incident, end to end."},
-        {"value": "66", "note": "tests, run in CI on every push."},
-    ],
-    "quote": ("The ward office said resolved. The AI believed them.", "Cedar didn’t."),
-    "quote_note": (
-        "The model chooses the words; code and policy choose the actions. A ward office’s "
-        "“resolved” only asks to close the case — any resident’s “not clean” reopens it, "
-        "and silence never closes it."
-    ),
-    # Drawn as a flow, left to right; `kind` styles the step.
-    "flow": [
-        ("Third report", "3 homes · 250 m · 72 h", ""),
-        ("Volunteer", "approves with one tap", ""),
-        ("Ring warned", "Hindi text + Polly voice", ""),
-        ("Ward office", "replies “resolved”", ""),
-        ("Cedar", "denies close_case", "deny"),
-        ("Residents", "one says “not clean”", ""),
-        ("Reopened", "silence never closes it", "end"),
-    ],
-    "detail": [
-        ("Listening",
-         "Hindi voice notes arrive on Telegram and go through Amazon Transcribe (hi-IN). "
-         "Bedrock quota was zero, so an open model — Gemma 4 E4B in llama.cpp on our own "
-         "EC2 Graviton4 instance — fills a fixed schema, and code validates every field."),
-        ("The tripwire",
-         "DynamoDB Streams feed an EventBridge Pipe into a rule written in plain code, not "
-         "AI: three different homes, every pair within 250 m, within 72 hours. One "
-         "DynamoDB transaction settles two “third” reports arriving at once."),
-        ("The case",
-         "One Step Functions execution per incident, waiting on three task tokens: the "
-         "volunteer’s approval, the ward office’s reply and the residents’ check-ins. A Map "
-         "state sends every warning as text and as an Amazon Polly voice note."),
-        ("Guarded",
-         "A Strands case agent whose every action is checked by Cedar policies that fail "
-         "closed. The ward office gets one email with counts, never names or numbers. Own "
-         "KMS key, CloudTrail, GuardDuty and alarms."),
-    ],
-    "tech": ["AWS CDK (Python)", "Lambda", "Transcribe", "Polly", "DynamoDB Streams",
-             "EventBridge Pipes", "Step Functions", "Strands", "Cedar", "EC2 Graviton4"],
-    "links": [
-        {"label": "Watch the demo", "href": "https://youtu.be/L0UteWpltyw"},
-        {"label": "Source", "href": "https://github.com/aryangorde6/teesri-shikayat"},
-        {"label": "Build story", "href": "https://builder.aws.com/content/3KYOE7QsILh1qS2cN5fbcCJDLzy/three-complaints-one-warning-a-dirty-water-tripwire-on-aws"},
-    ],
-}
-
-# --- work: case studies on paper -------------------------------------------------
-# Only projects on github.com/aryangorde6 appear on this site (Aryan, 08 Nov 2026).
-# Sources: each repo's README (fetched 08 Nov 2026) and the hackathon STATE files.
-# `figure` picks the drawing: "timeline" (to scale, in seconds) or "chain".
-
-CASES = [
+FEATURES = [
     {
-        "id": "teesra-kaan",
-        "name": "Teesra Kaan",
-        "tag": "Scam-call guardian · Meta Global AI Developer Hackathon",
-        "summary": (
-            "The third ear on a scam call. Put a suspicious call on speaker and it listens "
-            "in Hindi, Marathi or English. The moment the caller starts a known scam it warns "
-            "you in your language, quoting his own words — then shows his next line before "
-            "he says it."
+        "slug": "teesri-shikayat",
+        "name": "Teesri Shikayat",
+        "hindi": "तीसरी शिकायत",
+        "gloss": "the third complaint",
+        "kicker": "Runner-up · WeMakeDevs × AWS Environmental Hacks",
+        "teaser": "Three complaints, one warning. A dirty-water tripwire on AWS that only "
+                  "residents can switch off.",
+        "dek": (
+            "A tripwire for dirty tap water, from my own monsoon tap in Mumbai. Residents "
+            "complain with a Hindi voice note on Telegram. When three different homes within "
+            "250 m report dirty water inside 72 hours, every enrolled home in the ring is "
+            "warned in Hindi, and only the residents can close the case."
         ),
+        "video": "teesri-shikayat",
+        "video_caption": "The demo console, recorded: the third report lands and the ring "
+                         "is drawn. Simulated homes. Map © OpenStreetMap contributors.",
+        "demo": "tripwire",
+        "figures": [
+            {"value": "20/23", "note": "homes warned in the demo incident had never complained."},
+            {"value": "₹0.94", "note": "measured AWS cost of one real incident, end to end."},
+            {"value": "66", "note": "tests, run in CI on every push."},
+        ],
+        "quote": ("The ward office said resolved. The AI believed them.", "Cedar didn’t."),
+        "quote_note": (
+            "The model chooses the words; code and policy choose the actions. A ward office’s "
+            "“resolved” only asks to close the case. Any resident’s “not clean” reopens it, "
+            "and silence never closes it."
+        ),
+        "flow_title": "One case, as the demo recorded it",
+        "flow_caption": "A single Step Functions execution, waiting on people, never on a timer.",
+        "flow": [
+            ("Third report", "3 homes · 250 m · 72 h"),
+            ("Volunteer", "approves with one tap"),
+            ("Ring warned", "Hindi text + Polly voice"),
+            ("Ward office", "replies “resolved”"),
+            ("Cedar", "denies close_case"),
+            ("Residents", "one says “not clean”"),
+            ("Reopened", "silence never closes it"),
+        ],
+        "detail": [
+            ("Listening",
+             "Hindi voice notes arrive on Telegram and go through Amazon Transcribe (hi-IN). "
+             "Bedrock quota was zero, so an open model fills a fixed schema instead: Gemma 4 "
+             "E4B in llama.cpp on an EC2 Graviton4 instance. Code validates every field."),
+            ("The tripwire",
+             "DynamoDB Streams feed an EventBridge Pipe into a rule written in plain code, not "
+             "AI: three different homes, every pair within 250 m, within 72 hours. One "
+             "DynamoDB transaction settles two “third” reports arriving at once."),
+            ("The case",
+             "One Step Functions execution per incident, waiting on three task tokens: the "
+             "volunteer’s approval, the ward office’s reply and the residents’ check-ins. A Map "
+             "state sends every warning as text and as an Amazon Polly voice note."),
+            ("Guarded",
+             "A Strands case agent whose every action is checked by Cedar policies that fail "
+             "closed. The ward office gets one email with counts, never names or numbers. Own "
+             "KMS key, CloudTrail, GuardDuty and alarms."),
+        ],
+        "tech": ["AWS CDK (Python)", "Lambda", "Transcribe", "Polly", "DynamoDB Streams",
+                 "EventBridge Pipes", "Step Functions", "Strands", "Cedar", "EC2 Graviton4"],
+        "links": [
+            {"label": "Watch the demo", "href": "https://youtu.be/L0UteWpltyw"},
+            {"label": "Source", "href": "https://github.com/aryangorde6/teesri-shikayat"},
+            {"label": "Build story", "href": "https://builder.aws.com/content/3KYOE7QsILh1qS2cN5fbcCJDLzy/three-complaints-one-warning-a-dirty-water-tripwire-on-aws"},
+        ],
+    },
+    {
+        "slug": "teesra-kaan",
+        "name": "Teesra Kaan",
+        "hindi": "तीसरा कान",
+        "gloss": "the third ear",
+        "kicker": "Scam-call guardian · Meta Global AI Developer Hackathon, Indie track",
+        "teaser": "The third ear on a scam call. It warns in the caller's own words, then "
+                  "shows his next line before he says it.",
+        "dek": (
+            "Put a suspicious call on speaker and it listens in Hindi, Marathi or English. "
+            "The moment the caller starts a known scam it warns you in your language, quoting "
+            "his own words. Then it shows his next line before he says it."
+        ),
+        # Aryan, 08 Nov: link the live page. The meta STATE planned to stop the server
+        # after 16 Nov: re-check then and drop this if it's down.
+        "live": {"label": "Try it live", "href": "https://teesrakaan.aryangorde.com"},
         "figures": [
             {"value": "131/132", "note": "real US scam robocalls from the FTC warned on, in a test "
                                          "fixed before any result existed."},
@@ -429,10 +388,10 @@ CASES = [
                                      "A keyword list caught none."},
             {"value": "0/15", "note": "genuine test calls warned on, amber or red (synthetic voices)."},
         ],
-        "figure": "timeline",
         # The one call re-enacted by people on a real phone line (README, "Does it
         # work?"). Outside the frozen test: an example, not a measurement.
         "timeline": {
+            "title": "One call, to scale",
             "span": 50,
             "events": [
                 {"t": 0,  "time": "0:00", "lane": "caller", "row": 1, "what": "First false claim"},
@@ -474,15 +433,21 @@ CASES = [
         ],
     },
     {
-        "id": "shaky-ground",
+        "slug": "shaky-ground",
         "name": "Shaky Ground",
-        "tag": "Citation graph · Graph Hacks 2026, Track 01",
-        "summary": (
+        "kicker": "Citation graph · Graph Hacks (WeMakeDevs × FalkorDB), Track 01",
+        "teaser": "Finds the science built on retracted research, not just the papers "
+                  "that cite it.",
+        "dek": (
             "Finds the science built on retracted research, not just the papers that cite it. "
             "Every citation is weighted by how much the citing paper relies on the cited one, "
             "a chain's risk is computed in Cypher, and an agent decides which branches to "
-            "explore — returning every answer with its evidence."
+            "explore. Every answer comes back with its evidence."
         ),
+        "video": "shaky-ground",
+        # README, "Blast radius": ring k = strongest chain has k links; orange = builds on it.
+        "video_caption": "The live demo, recorded: the retracted 2006 paper at the centre, each "
+                         "ring one more citation away, and the papers that build on it in orange.",
         "figures": [
             {"value": "45", "note": "papers found building on Lesné et al. 2006 (Nature, retracted "
                                     "2024). Two of them were retracted themselves."},
@@ -491,10 +456,10 @@ CASES = [
             {"value": "27/30", "note": "links a third model, from another family, classed exactly as "
                                        "the judges did."},
         ],
-        "figure": "chain",
         # Schematic: the weights and the 0.2 threshold are the README's; the papers
         # are illustrative.
         "chain": {
+            "title": "How a chain is scored",
             "nodes": [("Retracted paper", "1.0"), ("Paper A", "1.0"), ("Paper B", "0.6"),
                       ("Paper C", "0.36")],
             "links": [("Foundational", "× 1.0", "uses its method"),
@@ -502,8 +467,8 @@ CASES = [
                       ("Supporting", "× 0.6", "relies on its finding")],
             "verdict": "Builds on it",
             "branch": (("Background", "× 0.15", "mentions it in passing"), ("Paper D", "0.15"), "In passing"),
-            "rule": "Builds on ⇔ risk ≥ 0.2: three supporting links score 0.6³ = 0.216, and any "
-                    "background link caps a chain at 0.15.",
+            "rule": "Builds on it when risk ≥ 0.2: three supporting links score 0.6³ = 0.216, and "
+                    "any background link caps a chain at 0.15.",
             "caption": "Schematic: how a chain is scored, in Cypher. Weights and threshold are the "
                        "project's; the papers are illustrative.",
         },
@@ -534,23 +499,34 @@ CASES = [
             {"label": "Source", "href": "https://github.com/aryangorde6/shaky-ground"},
         ],
     },
-]
-
-# --- work: builds drawn as a flow -------------------------------------------------
-# `pipeline` is drawn as a left-to-right flow; each step is (label, sub-label).
-
-PROJECTS = [
     {
-        "id": "jaisa-kaha",
+        "slug": "jaisa-kaha",
         "name": "Jaisa Kaha",
-        "tag": "Agents with owners · Flip the Switch, Track 02",
-        "blurb": (
+        "hindi": "जैसा कहा",
+        "gloss": "as she said it",
+        "kicker": "Agents with owners · Flip the Switch, Track 02",
+        "teaser": "An AI scribe that refuses to make up a cook's quantities. Only the cook's "
+                  "own account can fill a gap.",
+        "dek": (
             "An AI scribe that refuses to make up a cook's quantities. It writes down only the "
-            "amounts that were said and keeps a gap where none was — or where the cook said "
-            "“by feel” — and only the cook's own account can fill it. On a test sentence, four "
+            "amounts that were said and keeps a gap where none was (or where the cook said "
+            "“by feel”), and only the cook's own account can fill it. On a test sentence, four "
             "models out of four turned “ghee, by feel” into a number."
         ),
-        "pipeline": [
+        "video": "jaisa-kaha",
+        "video_caption": "From the demo: I answer for the cook, and Switch refuses me under "
+                         "Pothi's name. In the demo I play the cook on a second, labelled account.",
+        "figures": [
+            {"value": "7/8", "note": "missing amounts four models turned into numbers on a plain "
+                                     "prompt, on the demo dish."},
+            {"value": "0", "note": "numbers on Pothi's page that aren't a quote from the tape or "
+                                   "typed by the cook."},
+            {"value": "87", "note": "tests, Python standard library only."},
+        ],
+        "flow_title": "One dish through the Discord room",
+        "flow_caption": "Switch checks every message against its addressee's rule, so Pothi "
+                        "refuses everyone but the cook and Tape. That includes the AI, and me.",
+        "flow": [
             ("Voice note",  "the cook, in Marathi"),
             ("Tape",        "Transcribe mr-IN · every word, with its second"),
             ("Lekhak",      "Qwen3 on Bedrock · each amount cites the tape"),
@@ -558,49 +534,62 @@ PROJECTS = [
             ("Cook",        "fills a gap, then “page pakka”"),
             ("Page",        "only Pothi can change it"),
         ],
-        "caption": "One dish through the Discord room. Switch checks every message against its "
-                   "addressee's rule, so Pothi refuses everyone but the cook and Tape — the AI, and me.",
+        "detail": [
+            ("It never types a quantity",
+             "Lekhak (“writer”), an LLM on Amazon Bedrock in Mumbai, writes the draft as JSON, "
+             "and every amount is a range of words on the tape. Pothi (“the book”) is plain code "
+             "with no model: it reads the cited words off the tape and marks each line said, a "
+             "gap for the cook, or struck."),
+            ("Switch writes the refusal",
+             "Pothi belongs to the cook in Switch's records. When I or the AI try to give it a "
+             "number, Switch's server refuses under Pothi's name, and Pothi's code never "
+             "receives the message."),
+            ("Measured before the first recording",
+             "Both prompts were committed with their SHA-256 before the first real recording, "
+             "then run on four models on Bedrock. On the demo dish the plain prompt made up 7 "
+             "of 8 missing amounts. One recipe is a tiny sample, and the README says so."),
+            ("For Mom's recipes",
+             "Built for my mother's recipes; the page is for my sister, who is learning them. "
+             "In the demo I play the cook on a second account, and the voice note is a "
+             "synthetic voice. Both are labelled on screen."),
+        ],
         "tech": ["Switch", "Discord", "AWS Transcribe", "Amazon Bedrock", "Python (stdlib)"],
         "links": [
-            {"label": "Demo video", "href": "https://youtu.be/fnLvEMvr4IU",
-             "aria": "Jaisa Kaha demo video"},
-            {"label": "Source", "href": "https://github.com/aryangorde6/jaisa-kaha",
-             "aria": "Jaisa Kaha source on GitHub"},
+            {"label": "Demo video", "href": "https://youtu.be/fnLvEMvr4IU"},
+            {"label": "Source", "href": "https://github.com/aryangorde6/jaisa-kaha"},
         ],
     },
 ]
 
 # --- changelog --------------------------------------------------------------
-# Every build on github.com/aryangorde6, from each repo's README and the
-# hackathon STATE files. NOTE: there is no employment to list, so this is a
-# dated log of real shipped work, not a job history. Do not add invented roles.
-# `tech` only lists things named in that entry's own `detail`.
-# `anchor` (optional) links the entry to its write-up further up the page.
+# Every build on github.com/aryangorde6, newest first. There is no employment to
+# list, so this is a dated log of shipped work, not a job history.
+# `href` (optional) links to the build's feature page or its prize.
 
 CHANGELOG = [
-    {"period": "Nov 2026", "name": "Jaisa Kaha", "anchor": "jaisa-kaha",
+    {"period": "Nov 2026", "name": "Jaisa Kaha", "hindi": "जैसा कहा", "href": "/jaisa-kaha/",
      "context": "Flip the Switch · WeMakeDevs × DevTools Academy × Switch · solo",
      "detail": "An AI scribe for a family's recipes that writes down only the amounts the cook "
                "said and keeps a gap where none was. Three agents share one Discord room "
                "through Switch, and the cook's own agent refuses anyone else who tries to fill "
-               "a gap — the AI, and me.",
+               "a gap, the AI and me included.",
      "tech": ["Switch", "Discord", "AWS Transcribe", "Amazon Bedrock"]},
 
-    {"period": "Oct–Nov 2026", "name": "Teesra Kaan", "anchor": "teesra-kaan",
+    {"period": "Oct–Nov 2026", "name": "Teesra Kaan", "hindi": "तीसरा कान", "href": "/teesra-kaan/",
      "context": "Meta Global AI Developer Hackathon · Indie track",
      "detail": "A scam-call guardian in Hindi, Marathi and English that warns in the caller's "
                "own words and shows his next line before he says it. Tested once, on a set "
                "fixed before any result: 131 of 132 real FTC impersonation robocalls warned on.",
      "tech": ["Muse Voice Transcribe", "Muse Spark", "FastAPI"]},
 
-    {"period": "Oct 2026", "name": "Shaky Ground", "anchor": "shaky-ground",
+    {"period": "Oct 2026", "name": "Shaky Ground", "href": "/shaky-ground/",
      "context": "Graph Hacks · WeMakeDevs × FalkorDB · solo",
      "detail": "Finds the science built on retracted research: a FalkorDB citation graph where "
                "every citation is weighted by reliance and a chain's risk is computed in "
                "Cypher, with an agent that decides where to dig and an MCP server for other agents.",
      "tech": ["FalkorDB", "Cypher", "MCP"]},
 
-    {"period": "Oct 2026", "name": "Teesri Shikayat", "anchor": "teesri",
+    {"period": "Oct 2026", "name": "Teesri Shikayat", "hindi": "तीसरी शिकायत", "href": "/teesri-shikayat/",
      "context": "WeMakeDevs × AWS Environmental Hacks · solo", "prize": "Runner-up",
      "detail": "A dirty-water tripwire for Mumbai: Hindi voice complaints on Telegram, a "
                "plain-code rule for three homes within 250 m inside 72 hours, and one Step "
@@ -609,7 +598,7 @@ CHANGELOG = [
      "tech": ["Transcribe", "Polly", "EventBridge Pipes", "Step Functions", "Strands",
               "Cedar", "CDK"]},
 
-    {"period": "Oct 2026", "name": "The Adversary Line", "anchor": None,
+    {"period": "Oct 2026", "name": "The Adversary Line",
      "context": "Dark Factory · WeAreDevelopers × Band · solo",
      "detail": "A dark software factory: five coding-agent seats in Band Desktop building a "
                "reservation service in stages, each a complete container, while one seat "
@@ -617,7 +606,7 @@ CHANGELOG = [
      "tech": ["Band Desktop", "Docker"],
      "links": [{"label": "Source", "href": "https://github.com/aryangorde6/the-adversary-line"}]},
 
-    {"period": "Sep 2026", "name": "Antibody", "anchor": None,
+    {"period": "Sep 2026", "name": "Antibody",
      "context": "IBM Bob 2.0 Hackathon · lablab.ai · team of 2",
      "detail": "Do fixed bugs stay fixed? Antibody puts a project's past bug fixes back, one at "
                "a time, and runs its own tests. On sqlparse, 13 of 20 fixes were caught before "
@@ -627,7 +616,7 @@ CHANGELOG = [
      "links": [{"label": "Ledger", "href": "https://antibody-ledger.vercel.app/sqlparse/"},
                {"label": "Source", "href": "https://github.com/aryangorde6/antibody"}]},
 
-    {"period": "Sep 2026", "name": "Pukaar", "anchor": None,
+    {"period": "Sep 2026", "name": "Pukaar", "hindi": "पुकार",
      "context": "WeMakeDevs × AWS First Commit · solo",
      "detail": "Help for an older person living alone: one press pages the three people most "
                "likely to answer, at the same time; the first to say “I'm going” wins, and "
@@ -637,15 +626,15 @@ CHANGELOG = [
      "links": [{"label": "Source", "href": "https://github.com/aryangorde6/pukaar"},
                {"label": "Demo", "href": "https://youtu.be/GaQZs1yBAyU"}]},
 
-    {"period": "Sep 2026", "name": "Rote plays", "anchor": "rote",
+    {"period": "Sep 2026", "name": "Rote plays", "href": "#rote",
      "context": "WeMakeDevs × Modiqo Rote Playoffs Hackathon · solo", "prize": "Winner · 3rd place",
-     "detail": "Four read-only plays for pull-request review — unresolved threads, flaky CI, "
-               "who should review, and a truncation audit — plus a measured platform defect: "
+     "detail": "Four read-only plays for pull-request review (unresolved threads, flaky CI, "
+               "who should review, and a truncation audit), plus a measured platform defect: "
                "step output silently cut at 64 KiB, unchecked by 89% of public plays. Filed "
                "upstream and fixed in rote v0.83.0.",
      "tech": ["TypeScript", "GitHub GraphQL", "gh CLI"]},
 
-    {"period": "Aug–Sep 2026", "name": "Contour", "anchor": None,
+    {"period": "Aug–Sep 2026", "name": "Contour",
      "context": "AI Trading Agents Hackathon · lablab.ai × Alpaca",
      "detail": "An autonomous options agent that measures the volatility surface every 15 "
                "minutes and sells only the rich side of the skew, on paper. A 387-cycle "
@@ -660,7 +649,7 @@ EDUCATION = {
     "degree": "B.Tech, Computer Engineering",
     "institution": "Sardar Patel Institute of Technology",
     "affiliation": "Mumbai University · Mumbai, India",
-    "status": "Aug 2023 – June 2027",
+    "status": "Aug 2023 to June 2027",
     "detail": "Computer-science fundamentals with a practical bias: data structures, "
               "operating systems, databases, and machine learning, applied to things "
               "that actually get deployed.",
@@ -678,24 +667,24 @@ CERTIFICATIONS = [
 
 CONTACT = {
     "headline_pre": "Let's build something that",
-    "headline_em": "has to work.",
+    "headline_mark": "has to work.",
     "body": (
         "I'm after backend or full-stack work where the hard part is the system design, "
         "the data model, or keeping a deploy boring. If that's what you've got, I'd like "
-        "to hear about it. Fastest route is email — I reply to everything that isn't a "
+        "to hear about it. Email is fastest, and I reply to everything that isn't a "
         "recruiter template."
     ),
     "links": [
-        {"title": "GitHub",   "note": "@" + SITE["github_handle"], "href": SITE["github"], "icon": "↗"},
-        {"title": "LinkedIn", "note": "the formal version", "href": SITE["linkedin"], "icon": "↗"},
-        {"title": "Résumé",   "note": "PDF, one page",      "href": SITE["resume"],   "icon": "↓"},
+        {"title": "GitHub",   "note": "@" + SITE["github_handle"], "href": SITE["github"]},
+        {"title": "LinkedIn", "note": "the formal version", "href": SITE["linkedin"]},
+        {"title": "Résumé",   "note": "PDF, one page",      "href": SITE["resume"]},
     ],
 }
 
 # --- colophon ---------------------------------------------------------------
 
 COLOPHON = (
-    "Set in Archivo, Instrument Serif and JetBrains Mono, all self-hosted. Generated by "
-    "a small Python build — Jinja2 templates, content as Python data, a Pillow image "
-    "pipeline — into one HTML file that makes zero third-party requests."
+    "Set in Big Shoulders Display, Newsreader and Anek Devanagari, all self-hosted. Built by "
+    "a small Python script (Jinja2 templates, content as Python data, a Pillow image "
+    "pipeline) into static pages that make no third-party requests."
 )

@@ -1,0 +1,25 @@
+{# The Rote finding, hands-on. Drag the output size: past 64 KiB the runtime kept
+   only the first 64 KiB and still reported success. Rendered at the start value,
+   so without script it still reads correctly. #}
+{% set t = truncation %}
+{% set kept = [t.start_kib, t.limit_kib]|min %}
+<div class="demo trunc" data-trunc data-limit="{{ t.limit_kib }}" data-max="{{ t.max_kib }}">
+  <h4 class="demo-title">Try it: what a play saw</h4>
+  <label class="trunc-label" for="trunc-range">Output a step prints: <output id="trunc-out" data-t-printed>{{ t.start_kib }} KiB</output></label>
+  <input class="trunc-range" id="trunc-range" type="range" min="8" max="{{ t.max_kib }}" step="8" value="{{ t.start_kib }}" aria-describedby="trunc-read" />
+  <div class="trunc-bar" aria-hidden="true" style="--p: {{ (100 * t.start_kib / t.max_kib)|round(2) }}%; --l: {{ (100 * t.limit_kib / t.max_kib)|round(2) }}%">
+    <span class="tb-kept"></span><span class="tb-lost"></span><span class="tb-cut">64 KiB</span>
+  </div>
+  <dl class="trunc-read" id="trunc-read" aria-live="polite">
+    <div><dt>Kept by the runtime</dt><dd data-t-kept>{{ kept }} KiB</dd></div>
+    <div><dt>Dropped</dt><dd data-t-lost>{{ t.start_kib - kept }} KiB</dd></div>
+    <div><dt>Status the step reported</dt><dd>success</dd></div>
+  </dl>
+  <p class="trunc-verdict" data-t-verdict>{% if t.start_kib > t.limit_kib %}{{ t.start_kib - kept }} KiB gone, and nothing said so.{% else %}Under 64 KiB, nothing is lost.{% endif %}</p>
+  <figure class="dots">
+    <div class="dot-grid" role="img" aria-label="{{ t.plays_unchecked }} of {{ t.plays_reading }} squares filled">
+      {%- for i in range(t.plays_reading) %}<i{% if i < t.plays_unchecked %} class="on"{% endif %}></i>{% endfor -%}
+    </div>
+    <figcaption class="cap"><b>{{ t.plays_unchecked }} of the {{ t.plays_reading }}</b> public plays that read step output ({{ (100 * t.plays_unchecked / t.plays_reading)|round|int }}%) never checked whether it had been cut. Filed upstream; fixed in rote v0.83.0.</figcaption>
+  </figure>
+</div>

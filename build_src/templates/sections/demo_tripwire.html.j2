@@ -1,0 +1,33 @@
+{# The tripwire, hands-on. Tap homes to report dirty water. The rule is the
+   project's own, in plain code: three different homes, every pair within 250 m,
+   inside 72 hours. Homes are simulated. Without script, the explanation stands.
+   Positions are percentages of a 900 × 520 m plot; on a phone the plot stands
+   upright (x and y swap), which keeps every distance and the homes far enough
+   apart to tap. #}
+{% set tw = tripwire %}
+<div class="demo trip" data-trip data-w="{{ tw.w }}" data-h="{{ tw.h }}">
+  <h2 class="fig-title">Try the tripwire</h2>
+  <p class="demo-intro">Tap homes to report dirty water. It fires only on <b>three different homes</b>, <b>every pair within 250 m</b>, <b>inside 72 hours</b>. Then every home within 250 m is warned.</p>
+  <div class="trip-map" style="--mw: {{ tw.w }}; --mh: {{ tw.h }}">
+    <span class="trip-ring" data-trip-ring aria-hidden="true"></span>
+    {%- for h in tw.homes %}
+    <button type="button" class="home" data-home="{{ h.i }}" data-x="{{ h.x }}" data-y="{{ h.y }}" style="--x: {{ h.px }}%; --y: {{ h.py }}%" aria-label="Home {{ h.i }}" disabled></button>
+    {%- endfor %}
+    <span class="trip-scale" aria-hidden="true"><span>250 m</span></span>
+  </div>
+  <div class="trip-bar">
+    <p class="trip-clock"><span class="label">Clock</span> <span data-trip-clock>Day 1, 08:00</span></p>
+    <p class="trip-btns">
+      <button type="button" class="btn" data-trip-wait disabled>Wait a day</button>
+      <button type="button" class="btn" data-trip-reset disabled>Start again</button>
+    </p>
+  </div>
+  <p class="trip-status" data-trip-status role="status" aria-live="polite">Each report moves the clock on 3 hours. Reports older than 72 hours stop counting.</p>
+  <ul class="trip-key" aria-hidden="true">
+    <li><i class="k-home"></i>Enrolled home</li>
+    <li><i class="k-rep"></i>Reported</li>
+    <li><i class="k-warn"></i>Warned</li>
+    <li><i class="k-old"></i>Report too old to count</li>
+  </ul>
+  <p class="cap cap-dark">An illustration with simulated homes. In the real system the rule runs on DynamoDB Streams, a volunteer approves the warning, and it goes out as Hindi text and a Polly voice note.</p>
+</div>

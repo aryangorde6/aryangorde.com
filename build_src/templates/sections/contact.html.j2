@@ -1,41 +1,20 @@
 {% import "macros.html.j2" as m %}
-<section class="section ink contact" id="contact" tabindex="-1" aria-labelledby="contact-title">
+{# The back cover. The headline is the section's h2. #}
+<section class="section contact" id="contact" aria-labelledby="contact-title">
   <div class="wrap">
-    {# The last sheet's headline *is* its title, so no separate "CONTACT"
-       heading competing with it — the meta row still names the sheet. #}
-    <header class="sec-head rv">
-      <div class="sec-meta" aria-hidden="true">
-        <span>§{{ m.nn(sec.contact) }} — Contact</span>
-        <span>Sheet {{ m.nn(sec.contact) }} / {{ m.nn(sheet_count) }}</span>
-      </div>
-      <h2 class="contact-headline" id="contact-title">{{ contact.headline_pre }} <em>{{ contact.headline_em }}</em></h2>
-    </header>
-
+    <h2 class="contact-head" id="contact-title">{{ contact.headline_pre }} <span class="ul">{{ contact.headline_mark }}</span></h2>
     <div class="contact-grid">
-      <div class="contact-main rv">
+      <div>
         <p class="contact-body">{{ contact.body }}</p>
-
-        <div class="mail-row">
-          <a class="mail-big" href="mailto:{{ site.email }}">{{ site.email }}</a>
-          <button type="button" class="btn btn-outline btn-sm" data-copy="{{ site.email }}" hidden>Copy</button>
-        </div>
-        <p class="copy-status" data-copy-status role="status" aria-live="polite"></p>
-
-        <p class="local-time">
-          <span class="label">Local time, {{ site.location }}</span>
-          <span class="clock" data-clock data-tz="{{ site.timezone }}" data-tz-label="{{ site.tz_label }}">{{ site.tz_label }} · UTC+5:30</span>
+        <p class="mail-row">
+          <a class="mail" href="mailto:{{ site.email }}">{{ site.email }}</a>
+          <button type="button" class="btn btn-ink" data-copy="{{ site.email }}" hidden>Copy</button>
         </p>
+        <p class="copy-status" data-copy-status role="status" aria-live="polite"></p>
       </div>
-
-      <ul class="link-rows rv">
+      <ul class="contact-links">
         {%- for l in contact.links %}
-        <li>
-          <a class="link-row" href="{{ l.href }}"{{ m.ext(l.href) }}>
-            <span class="lr-title">{{ l.title }}</span>
-            <span class="lr-note">{{ l.note }}</span>
-            <span class="lr-icon" aria-hidden="true">{{ l.icon }}</span>
-          </a>
-        </li>
+        <li><a href="{{ l.href }}"{{ m.ext(l.href) }}><b>{{ l.title }}</b><span>{{ l.note }}</span>{{ m.arr(l.href) }}</a></li>
         {%- endfor %}
       </ul>
     </div>

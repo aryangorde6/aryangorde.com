@@ -1,11 +1,26 @@
 {% extends "base.html.j2" %}
-
+{% block head_extra %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": "{{ site.name }}",
+  "url": "{{ site.domain }}/",
+  "image": "{{ site.domain }}/{{ photo.og }}",
+  "jobTitle": "{{ site.role }}",
+  "email": "mailto:{{ site.email }}",
+  "alumniOf": "{{ education.institution }}",
+  "award": [{% for r in results %}"{{ r.rank_full }}, {{ r.organizer }} {{ r.event }} ({{ r.dates }})"{% if not loop.last %}, {% endif %}{% endfor %}],
+  "sameAs": ["{{ site.github }}", "{{ site.linkedin }}"]
+}
+</script>
+{% endblock %}
 {% block content %}
-{% include "sections/hero.html.j2" %}
-{% include "sections/about.html.j2" %}
-{% include "sections/results.html.j2" %}
-{% include "sections/stack.html.j2" %}
+{% include "sections/cover.html.j2" %}
 {% include "sections/work.html.j2" %}
+{% include "sections/prizes.html.j2" %}
+{% include "sections/about.html.j2" %}
+{% include "sections/stack.html.j2" %}
 {% include "sections/changelog.html.j2" %}
 {% include "sections/contact.html.j2" %}
 {% endblock %}

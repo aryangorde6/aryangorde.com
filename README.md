@@ -1,12 +1,12 @@
 # aryangorde.com
 
-Personal portfolio for Aryan Gorde — backend & full-stack developer.
+Personal portfolio for Aryan Gorde, backend and full-stack developer.
 Built with Python. Served as static files from AWS (a private S3 bucket behind CloudFront).
 
-**Design:** an engineering drawing. The page is a set of numbered drafting
-sheets — warm paper with a fine grid, ink linework, mono annotation and a
-single signal-orange accent that means "live". The stack is drawn as the
-system it actually forms, with packets travelling along the wires.
+**Design:** a magazine. Black pages with white type, a cool white "paper" for the record
+(prizes, open source, everything shipped) and a yellow back cover. The home page is the
+cover: the name set huge over a colour portrait, three cover lines and a deck. Each build
+gets its own feature page, with its Hindi name set big in the headline.
 
 ---
 
@@ -18,23 +18,23 @@ pip install -r requirements.txt
 python3 build.py
 ```
 
-That renders `build_src/` into a single self-contained `index.html`, plus
-responsive image derivatives in `images/` and the self-hosted fonts in
-`fonts/`.
+That renders `build_src/` into static pages, each self-contained (CSS and JS inlined):
+`index.html`, one `<slug>/index.html` per feature and `404.html`. Alongside them: responsive
+photo derivatives in `images/`, the self-hosted fonts in `fonts/`, the silent loops in
+`video/` and the link-preview images in `og/`.
 
 | Command | What it does |
 | --- | --- |
-| `python3 build.py` | Build `index.html` + images + fonts |
+| `python3 build.py` | Build every page + images + fonts + loops + link previews |
 | `python3 build.py --serve` | Build, serve on :5500, rebuild on file change |
-| `python3 build.py --check` | Fail (non-zero exit) if `index.html` is stale — for CI |
+| `python3 build.py --check` | Fail (non-zero exit) if any page is stale (for CI) |
+| `python3 og.py` | Re-render the link-preview images with headless Chrome |
 
 ## Why a build step for a static page
 
-The content lives in `build_src/content.py` as plain Python data. Adding a
-build to the changelog is appending a dict, not copy-pasting a `<div>`. The
-stack diagram and the Teesri Shikayat ring are computed in
-`build_src/drawings.py`, so the browser receives finished SVG. The build also enforces invariants that are easy to break by
-hand and silent when broken:
+The content lives in `build_src/content.py` as plain Python data. Adding a build to the
+changelog is appending a dict; adding a feature page is appending a dict to `FEATURES`. The
+build also enforces invariants that are easy to break by hand and silent when broken:
 
 1. every CSS class used in markup is actually defined in the stylesheet
 2. every internal `#anchor` points at an id that exists
@@ -45,104 +45,121 @@ hand and silent when broken:
    request the page makes
 6. every figure with a `check` key in `FIGURES` matches what it counts (builds
    in `CHANGELOG`, prizes in `RESULTS`, `CERTIFICATIONS`)
+7. every link to another page of the site (`/slug/`, `/#id`) lands on a page and an id that exist
+8. every Devanagari letter on the site is in the Hindi font subset
 
-Any of those failing **fails the build** rather than shipping a subtly broken
-page.
+Any of those failing **fails the build** rather than shipping a subtly broken page.
 
 ## Layout
 
 ```
 build.py                     the build
+og.py                        renders the link-preview images (run by hand, output committed)
 requirements.txt             jinja2, pillow
 build_src/
   content.py                 ← all the words live here
-  drawings.py                geometry for the stack diagram and the ring
+  drawings.py                the simulated homes for the tripwire demo
   templates/
     base.html.j2             page skeleton, <head>, fonts, inlining
-    index.html.j2            section order
-    macros.html.j2           sheet header, chips, external links
-    sections/*.html.j2       one file per section, plus the ⌘K menu
+    index.html.j2            the home page: section order
+    feature.html.j2          one page per build
+    404.html.j2              "Not in this issue."
+    macros.html.j2           department header, buttons, video loop, project name
+    sections/*.html.j2       one file per section, plus the two hands-on demos
   static/
     css/site.css             the design system
     js/site.js               behaviour (progressive enhancement only)
-  fonts/*.woff2              Archivo, Instrument Serif, JetBrains Mono (OFL)
+  fonts/*.woff2              Big Shoulders Display, Newsreader, Anek Devanagari (OFL)
   images/aryan.jpg           source photo (build resizes it)
   images/awards/*.png        crops of the two winners graphics (header + own row only)
+  video/*.mp4, *.jpg         8-second silent loops and their posters
+  og/*.jpg                   link-preview images (made by og.py)
 
-index.html                   ← GENERATED, do not edit
-images/aryan-*.{webp,jpg}    ← GENERATED
-images/award-*.{webp,jpg}    ← GENERATED
-fonts/*.woff2                ← GENERATED (copied from build_src/fonts)
+index.html, 404.html         ← GENERATED, do not edit
+<slug>/index.html            ← GENERATED (one per feature)
+images/, fonts/, video/, og/ ← GENERATED (resized or copied from build_src)
 ```
 
-## The sheets
+## The pages
 
-| § | Sheet | What's on it |
-| --- | --- | --- |
-| 00 | Index | Name in expanded type with the portrait set inline, a dimension line, then the year's two hackathon prizes as stamped plates — the centre of the first screen on desktop and phone — and a drawing note for the fixes merged upstream. Blurb, buttons and the drawing's title block follow. A CAD crosshair follows the cursor. |
-| 01 | About | Lede, bio, spec table, four figures (each checked against the page by the build). |
-| 02 | Results | The 2026 hackathon prizes as stamped cards (runner-up at WeMakeDevs × AWS Environmental Hacks; winner, 3rd place, at the Rote Playoffs Hackathon), and every other entry in a log. Each prize card carries a detail of the organisers' own winners graphic (header + Aryan's row only, joined by a break line; the other winners' photos are cut out). Between them, "Merged upstream": fixes accepted into NumPy (#32915) and Pillow (#10147, shipped in 13.0.0). The hero plates link here and to the case study. |
-| 03 | Stack | Every tool, drawn as a request path: client → edge → application → data / async / AI, inside a runtime boundary, with CI/CD shipping into it. |
-| 04 | Work | Teesri Shikayat on an ink sheet — the 250 m ring and the case flow; Teesra Kaan with a scam call drawn to scale (each predicted line, and how far ahead it came); Shaky Ground with how a citation chain is scored; Jaisa Kaha as a flow through its Discord room. |
-| 05 | Changelog | Every 2026 build as a commit rail (prize tags on placed entries), with education and certifications alongside. |
-| 06 | Contact | Headline, email with copy, live Mumbai time, link rows. The footer is the drawing's title block. |
+**Home**, in order:
 
-Hackathon facts come from `~/rote_hack/HACKATHON-HANDOFF.md` and each
-project's own README or overview (fetched from GitHub). Upstream facts come from the pull requests
-themselves and the projects' release notes. An entry's outcome says only what is known
-("Submitted" claims nothing more).
+| Section | What's on it |
+| --- | --- |
+| Cover | The name over a colour portrait. Three cover lines (runner-up at WeMakeDevs × AWS Environmental Hacks; winner, 3rd place, at the Rote Playoffs Hackathon; fixes merged into NumPy and Pillow), each linking to its proof, then the deck. |
+| Work | The four builds: Teesri Shikayat as the lead story with its loop, then Teesra Kaan, Shaky Ground and Jaisa Kaha. Each links to its feature page. |
+| Prizes | One spread per prize, each with a detail of the organisers' own winners graphic (header + Aryan's row only, joined by a break line; the other winners are cut out). The Rote spread has a 64 KiB slider: drag the output size and watch what the runtime kept while it reported success. |
+| Open source | The fixes merged into NumPy (#32915) and Pillow (#10147, shipped in 13.0.0), then every other 2026 entry in a table. |
+| About | Lede, bio, facts, four figures (each checked against the page by the build). |
+| Stack | The tools by where they sit in a request, as a list. |
+| Everything shipped | Every 2026 build, newest first, with education and certifications alongside. |
+| Contact | The yellow back cover: headline, email with copy, link rows. |
 
-The Teesri Shikayat ring is a **schematic** of the recorded demo incident: the
-counts (3 reported, 23 warned, 20 of them never complained) are the demo's,
-the positions are illustrative and seeded so the build stays deterministic.
+**Feature pages** (`/teesri-shikayat/`, `/teesra-kaan/`, `/shaky-ground/`, `/jaisa-kaha/`):
+the name (Devanagari over the Latin when it has one) and what it means, the deck, the loop,
+three numbers, then the project's own figure: the **tripwire demo** (tap simulated homes;
+the rule is the project's: three homes, every pair within 250 m, inside 72 hours), a call
+drawn to scale, a citation chain scored, or a flow through a Discord room. Four short
+sections on how it works, what it's built with, and the next feature.
 
-The Teesra Kaan timeline is the one call re-enacted by people on a real phone
-line, captioned as an example outside the frozen test. The Shaky Ground chain
+Hackathon facts come from `~/rote_hack/HACKATHON-HANDOFF.md` and each project's own README
+or overview (fetched from GitHub). Upstream facts come from the pull requests themselves and
+the projects' release notes. An entry's outcome says only what is known ("Submitted" claims
+nothing more).
+
+The tripwire demo uses **simulated homes**, seeded so the build stays deterministic; the
+rule is the project's own. The Teesra Kaan timeline is the one call re-enacted by people on
+a real phone line, captioned as an example outside the frozen test. The Shaky Ground chain
 is a **schematic**: the weights and threshold are the project's, the papers are
 illustrative.
+
+The loops are cut from Aryan's own demo recordings: 8 seconds, muted, H.264. Every distinct
+frame was checked for phone numbers and for other people's faces or names before a clip was
+added. They load nothing until they're on screen.
 
 **Only projects from [github.com/aryangorde6](https://github.com/aryangorde6)
 appear on the site.**
 
 ## Type and colour
 
-Fonts are self-hosted from `fonts/` (same origin), so the page still makes
-zero third-party requests.
+Fonts are self-hosted from `fonts/` (same origin), so the pages make zero third-party
+requests.
 
-- **Archivo** (variable width + weight) — titles at 120–125% width, body at 100%
-- **JetBrains Mono** — annotation, labels, chips
-- **Instrument Serif italic** — emphasis only (`<em>` in content.py)
+- **Big Shoulders Display**: headlines, uppercase, 700 to 900
+- **Newsreader**: text
+- **Anek Devanagari** (condensed, bold): the Hindi names only. The file is a subset holding
+  just their letters (3 KB); change a Hindi name and fetch a new subset (see
+  `DEVANAGARI_SUBSET` in build.py).
 
 | Pair | Ratio |
 | --- | --- |
-| ink `#121211` on paper `#f1efe8` | 16.3 : 1 |
-| muted `#5b5951` on paper | 6.1 : 1 |
-| accent-ink `#b8320a` on paper | 5.2 : 1 |
-| accent `#ff4f1a` on ink | 5.7 : 1 |
-| ink on accent | 5.7 : 1 |
-| on-ink-muted `#a9a69c` on ink | 7.7 : 1 |
+| white `#f4f4f4` on black `#0b0b0b` | 17.9 : 1 |
+| body `#d6d6d6` on black | 13.5 : 1 |
+| dim `#9a9a9a` on black | 7.0 : 1 |
+| yellow `#ffd60a` on black | 13.9 : 1 |
+| black on paper `#f4f4f4` | 17.9 : 1 |
+| dim `#5a5a5a` on paper | 6.3 : 1 |
+| black on yellow | 13.9 : 1 |
+| dim `#4d4300` on yellow | 7.0 : 1 |
 
-The bright accent is never used for small text on paper; that's what
-`--accent-ink` is for.
+Yellow is never used for text on the white paper.
 
 ## Output
 
-`index.html` is ~152 KB (~36 KB gzipped) with CSS and JS inlined. First load is
-roughly 200 KB including one photo derivative and ~140 KB of fonts.
+The home page is ~95 KB (~23 KB gzipped) with CSS and JS inlined; a feature page ~65 KB
+(~17 KB gzipped). Fonts are ~180 KB. The loops (100 to 310 KB each) and the award details load
+only when they come on screen.
 
 ## Accessibility
 
-- Motion is decided before first paint from `prefers-reduced-motion`. With
-  reduced motion nothing animates; the diagram starts paused and offers Play.
-- The looping diagram has a visible Pause control (WCAG 2.2.2) and only runs
-  while on screen. The Jaisa Kaha flow sweeps once (~2.5 s) and stops.
-- Scroll reveals disarm themselves if `IntersectionObserver` never delivers,
-  so content can never be stranded at `opacity: 0`.
-- The diagram's boxes are real HTML, not SVG text, and reflow into a vertical
-  flow on small screens.
-- The ⌘K / Ctrl-K / `/` menu is a native `<dialog>` with a combobox + listbox.
-  It is JS-only; without JS the nav links scroll horizontally on phones.
-- Skip link, semantic landmarks, one `h1`, no skipped heading levels.
+- Motion is decided before first paint from `prefers-reduced-motion`. With reduced motion
+  no loop plays until its Play button is pressed.
+- Every loop has a visible Pause button (WCAG 2.2.2) and only plays while at least 40% on
+  screen. Without JS, the poster is shown.
+- Both demos are real HTML controls (a range input; buttons for the homes) with a live
+  status line, and read correctly before any script runs. On a phone the tripwire map
+  stands upright so the homes stay far enough apart to tap.
+- Skip link, semantic landmarks, one `h1` per page, no skipped heading levels.
 
 ## Deployment
 
@@ -152,7 +169,8 @@ AWS, defined in [`infra/site.yaml`](infra/site.yaml) (CloudFormation, stack
 - a **private S3 bucket** in Mumbai: no public access, versioned (old versions kept 30 days);
 - **CloudFront** in front of it: HTTPS with a free ACM certificate (us-east-1), HTTP/2 and
   HTTP/3, gzip/brotli, security headers, `www` → bare-domain 301 redirect (a CloudFront
-  Function), and unknown paths answered with the home page and a 404 status.
+  Function, which also serves `/slug/` from `/slug/index.html` and sends `/slug` to
+  `/slug/`), and unknown paths answered with the "Not in this issue" page and a 404 status.
 
 DNS stays at Hostinger: `@` is an ALIAS and `www` a CNAME to the distribution's
 `*.cloudfront.net` name (see [`infra/HOSTINGER_DNS.md`](infra/HOSTINGER_DNS.md)).
@@ -163,10 +181,10 @@ To publish a change:
 python3 build.py && infra/deploy.sh
 ```
 
-`deploy.sh` checks that `index.html` matches `build_src/` and that the public résumé is the
-copy without the phone number, uploads **only** `index.html`, the résumé PDF, `images/` and
-`fonts/`, sets cache headers (page and PDF 5 minutes, images and fonts a week) and clears
-CloudFront's cache. Nothing else in the repo is ever served.
+`deploy.sh` checks that every page matches `build_src/` and that the public résumé is the
+copy without the phone number, uploads **only** the pages (`index.html`, `404.html`, the
+feature folders), the résumé PDF, `images/`, `fonts/`, `video/` and `og/`, sets cache headers
+(pages and PDF 5 minutes, everything else a week) and clears CloudFront's cache. Nothing else in the repo is ever served.
 
 Cost: CloudFront's always-free allowance (1 TB and 10 million requests a month) covers a
 portfolio; S3 storage for a few MB is a fraction of a cent.

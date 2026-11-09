@@ -1,0 +1,84 @@
+{% import "macros.html.j2" as m %}
+{# Prizes: a spread per placed result, each with the organisers' own graphic,
+   cropped to its header and Aryan's row. Then every other entry, logged. #}
+<section class="section paper" id="prizes" aria-labelledby="prizes-title">
+  <div class="wrap">
+    {{ m.sec_head('prizes', 'Prizes', results|length ~ ' hackathon prizes in 2026, both solo.') }}
+
+    {%- for r in results %}
+    <article class="prize" id="{{ r.id }}" aria-labelledby="{{ r.id }}-title">
+      <div class="prize-text">
+        <p class="prize-rank">{% if r.get('rank_lead') %}<span class="rank-lead">{{ r.rank_lead }}</span>{% endif %}<span>{{ r.rank }}</span></p>
+        <h3 class="prize-event" id="{{ r.id }}-title">{{ r.event }}</h3>
+        <p class="prize-org">{{ r.organizer }} · {{ r.dates }}</p>
+        <p class="prize-field">{{ r.field }}</p>
+        <p class="prize-build"><b>{{ r.build }}</b>: {{ r.summary }}</p>
+        <dl class="facts">
+          <div><dt>Track</dt><dd>{{ r.track }}</dd></div>
+          <div><dt>Prize</dt><dd>{{ r.prize }}</dd></div>
+          <div><dt>Team</dt><dd>{{ r.team }}</dd></div>
+        </dl>
+        {{ m.buttons(r.links) }}
+      </div>
+      {%- if r.get('proof') %}
+      <figure class="proof">
+        {%- for part in r.proof.parts %}
+        {% set a = awards[part.name] %}
+        {%- if not loop.first %}
+        <span class="proof-break" aria-hidden="true"><svg viewBox="0 0 28 14" focusable="false"><path d="M0 7h9l3-6 4 12 3-6h9" /></svg></span>
+        {%- endif %}
+        <picture class="proof-part" style="--w: {{ a.pct }}%">
+          <source type="image/webp" srcset="/{{ a.webp }}" />
+          <img src="/{{ a.jpg }}" alt="{{ part.alt }}" width="{{ a.w }}" height="{{ a.h }}" loading="lazy" decoding="async" />
+        </picture>
+        {%- endfor %}
+        <figcaption class="cap">{{ r.proof.caption }}
+          {%- if r.proof.get('post') %} <a class="text-link" href="{{ r.proof.post }}"{{ m.ext(r.proof.post) }}>See WeMakeDevs’ original post on LinkedIn <span aria-hidden="true">↗</span></a>{% endif %}</figcaption>
+      </figure>
+      {%- endif %}
+      {%- if r.get('demo') == 'truncation' %}
+      {% include "sections/demo_truncation.html.j2" %}
+      {%- endif %}
+    </article>
+    {%- endfor %}
+  </div>
+</section>
+
+<section class="section paper" id="open-source" aria-labelledby="open-source-title">
+  <div class="wrap">
+    {{ m.sec_head('open-source', 'Open source', upstream|length ~ ' fixes merged into other people’s projects.') }}
+    <div class="prs">
+      {%- for u in upstream %}
+      <article class="pr" id="{{ u.id }}" aria-labelledby="{{ u.id }}-title">
+        <p class="chip chip-ink">Merged · {{ u.merged }}</p>
+        <h3 class="pr-name" id="{{ u.id }}-title">{{ u.project }} <span class="pr-num">#{{ u.number }}</span></h3>
+        <p class="pr-title"><code>{{ u.title }}</code></p>
+        <p class="pr-summary">{{ u.summary }}</p>
+        <dl class="facts">
+          <div><dt>Repository</dt><dd>{{ u.repo }}</dd></div>
+          <div><dt>Diff</dt><dd>{{ u.diff }}</dd></div>
+          <div><dt>Status</dt><dd>{{ u.status }}</dd></div>
+        </dl>
+        <a class="btn" href="{{ u.href }}"{{ m.ext(u.href) }}>View the pull request <span class="arr" aria-hidden="true">↗</span></a>
+      </article>
+      {%- endfor %}
+    </div>
+
+    <h3 class="sub-head">Also entered in 2026</h3>
+    <table class="entries">
+      <thead>
+        <tr><th scope="col">When</th><th scope="col">Hackathon</th><th scope="col">What I built</th><th scope="col">Outcome</th></tr>
+      </thead>
+      <tbody>
+        {%- for e in entries %}
+        <tr>
+          <td class="ent-when">{{ e.when }}</td>
+          <td class="ent-event"><b>{{ e.event }}</b><span>{{ e.organizer }}</span></td>
+          <td class="ent-build"><b>{{ e.build }}</b>: {{ e.what }}</td>
+          <td class="ent-out">{{ e.outcome }}</td>
+        </tr>
+        {%- endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>

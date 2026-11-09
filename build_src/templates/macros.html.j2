@@ -1,53 +1,51 @@
-{# ===========================================================================
-   COMPONENT MACROS
+{# Small pieces every page draws the same way. #}
 
-   Small, so every section draws its furniture the same way: the sheet header,
-   chips, and links that open elsewhere.
-   =========================================================================== #}
+{# rel/target for anything that leaves the site. #}
+{% macro ext(href) %}{% if href.startswith('http') %} target="_blank" rel="noopener"{% endif %}{% endmacro %}
 
-{# Two-digit sheet number: 1 -> "01". #}
-{% macro nn(n) %}{{ '%02d'|format(n) }}{% endmacro %}
+{# The arrow that says where a link goes: down the page, to another page, or off-site. #}
+{% macro arr(href) %}<span class="arr" aria-hidden="true">{{ '↓' if href.startswith('#') else ('↗' if href.startswith('http') else '→') }}</span>{% endmacro %}
 
-{# The header every numbered sheet opens with:
-
-     §02 — Stack ─────────────────────────────── Sheet 02 / 05
-     STACK                          the stack, drawn as a system   #}
-{% macro sec_head(num, id, title, total, aside='') %}
-<header class="sec-head rv">
-  <div class="sec-meta" aria-hidden="true">
-    <span>§{{ nn(num) }} — {{ title }}</span>
-    <span>Sheet {{ nn(num) }} / {{ nn(total) }}</span>
-  </div>
-  <div class="sec-title-row">
-    <h2 class="sec-title" id="{{ id }}-title">{{ title }}</h2>
-    {% if aside %}<p class="sec-aside">{{ aside }}</p>{% endif %}
-  </div>
-</header>
-{% endmacro %}
-
-{% macro chips(items, extra='') %}
-<ul class="chips{% if extra %} {{ extra }}{% endif %}">
+{% macro chips(items) %}
+<ul class="chips">
   {%- for item in items %}<li>{{ item }}</li>{% endfor -%}
 </ul>
 {% endmacro %}
 
-{# rel/target for anything that leaves the page. #}
-{% macro ext(href) %}{% if href.startswith('http') %} target="_blank" rel="noopener"{% endif %}{% endmacro %}
+{# A department header: a heavy rule, the title, one line under it. #}
+{% macro sec_head(id, title, dek='') %}
+<header class="sec-head">
+  <h2 class="sec-title" id="{{ id }}-title">{{ title }}</h2>
+  {% if dek %}<p class="sec-dek">{{ dek }}</p>{% endif %}
+</header>
+{% endmacro %}
 
-{# A round rubber stamp: text on a top arc and a bottom arc, a band across the
-   middle. Arcs are sized so the text clears the band at 8.5px; keep each arc
-   under ~23 characters. #}
-{% macro stamp(top, band, bottom, uid, rot) %}
-<svg class="stamp" viewBox="0 0 140 140" style="--rot: {{ rot }}deg" aria-hidden="true" focusable="false">
-  <defs>
-    <path id="st-top-{{ uid }}" d="M22 70A48 48 0 0 1 118 70" />
-    <path id="st-bot-{{ uid }}" d="M14 70A56 56 0 0 0 126 70" />
-  </defs>
-  <circle class="stamp-ring" cx="70" cy="70" r="66" />
-  <circle class="stamp-ring stamp-ring-in" cx="70" cy="70" r="42" />
-  <text class="stamp-arc"><textPath href="#st-top-{{ uid }}" startOffset="50%" text-anchor="middle">{{ top }}</textPath></text>
-  <text class="stamp-arc"><textPath href="#st-bot-{{ uid }}" startOffset="50%" text-anchor="middle">{{ bottom }}</textPath></text>
-  <rect class="stamp-band" x="4" y="57" width="132" height="26" />
-  <text class="stamp-word" x="70" y="75.5" text-anchor="middle">{{ band }}</text>
-</svg>
+{# A row of links: the first is the solid one. #}
+{% macro buttons(links, extra='') %}
+<p class="btn-row{% if extra %} {{ extra }}{% endif %}">
+  {%- for l in links %}
+  <a class="btn{{ ' btn-solid' if loop.first else '' }}" href="{{ l.href }}"{{ ext(l.href) }}>{{ l.label }} {{ arr(l.href) }}</a>
+  {%- endfor %}
+</p>
+{% endmacro %}
+
+{# A silent loop from a demo recording. The poster is a real <img> so it can
+   lazy-load; the video loads nothing until script plays it on screen. With
+   reduced motion it waits for the Play button. Without script: the poster. #}
+{% macro loop(v, alt, eager=False) %}
+<div class="loop" data-loop>
+  <img class="loop-poster" src="/{{ v.poster }}" alt="{{ alt }}" width="{{ v.w }}" height="{{ v.h }}"{% if not eager %} loading="lazy"{% endif %} decoding="async" />
+  <video class="loop-video" muted loop playsinline preload="none" width="{{ v.w }}" height="{{ v.h }}" aria-hidden="true" tabindex="-1">
+    <source src="/{{ v.mp4 }}" type="video/mp4" />
+  </video>
+  <button class="loop-btn" type="button" data-loop-btn hidden>Pause</button>
+</div>
+{% endmacro %}
+
+{# The project name as set in a headline: Devanagari over the Latin, when it has one. #}
+{% macro name(f, tag='span', cls='') %}
+<{{ tag }} class="pname{% if cls %} {{ cls }}{% endif %}">
+  {%- if f.get('hindi') %}<span class="pname-hi" lang="hi">{{ f.hindi }}</span>{% endif -%}
+  <span class="pname-en">{{ f.name }}</span>
+</{{ tag }}>
 {% endmacro %}

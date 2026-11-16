@@ -21,17 +21,19 @@ Parameters:
       Attach www.DomainName too. "false" while the certificate covers only the bare domain
       (e.g. www still points elsewhere and its CAA blocks Amazon).
 
-  GitHubRepo:
+  GitHubSubject:
     Type: String
-    Default: aryangorde6/aryangorde.com
+    Default: "repo:aryangorde6@322800880/aryangorde.com@1450293907"
     Description: >-
-      The repository whose main branch may deploy the site (GitHub Actions, OIDC).
-      Empty = no deploy role.
+      GitHub's OIDC subject prefix for the repository whose main branch may deploy the
+      site. Read it with `gh api repos/OWNER/REPO/actions/oidc/customization/sub`
+      (sub_claim_prefix). This is GitHub's "immutable" form, with the owner and repo IDs,
+      so a renamed or re-created repository can't inherit the access. Empty = no deploy role.
 
 Conditions:
   HasCert: !Not [!Equals [!Ref CertificateArn, ""]]
   WithWww: !And [!Condition HasCert, !Equals [!Ref IncludeWww, "true"]]
-  WithDeployRole: !Not [!Equals [!Ref GitHubRepo, ""]]
+  WithDeployRole: !Not [!Equals [!Ref GitHubSubject, ""]]
 
 Resources:
   # Private bucket: nothing is public; only this distribution can read it (OAC below).
@@ -241,7 +243,7 @@ Resources:
       Url: https://token.actions.githubusercontent.com
       ClientIdList: [sts.amazonaws.com]
 
-  # Only a workflow on GitHubRepo's main branch can assume this role (not PRs, forks or
+  # Only a workflow on the GitHubSubject repo's main branch can assume this role (not PRs, forks or
   # other branches), and it can only do what infra/deploy.sh does: read the stack's
   # outputs, write this bucket, and invalidate this distribution.
   DeployRole:
@@ -260,7 +262,7 @@ Resources:
             Condition:
               StringEquals:
                 token.actions.githubusercontent.com:aud: sts.amazonaws.com
-                token.actions.githubusercontent.com:sub: !Sub "repo:${GitHubRepo}:ref:refs/heads/main"
+                token.actions.githubusercontent.com:sub: !Sub "${GitHubSubject}:ref:refs/heads/main"
       Policies:
         - PolicyName: deploy-site
           PolicyDocument:

@@ -92,7 +92,7 @@ ABOUT = {
     ],
     "spec": [
         ("Studying",  "B.Tech, Computer Engineering, SPIT (2027)"),
-        ("Latest",    "Jaisa Kaha, Nov 2026"),
+        ("Latest",    "CareCircle, Nov 2026"),
         ("Learning",  "Distributed systems"),
         ("Based in",  "Mumbai"),
     ],
@@ -101,7 +101,7 @@ ABOUT = {
 # Figures on the about spread. build.py fails if a figure with a `check` key
 # drifts from what it counts.
 FIGURES = [
-    {"value": 9, "suffix": "",  "label": "builds shipped in 2026", "check": "changelog_2026"},
+    {"value": 10, "suffix": "", "label": "builds shipped in 2026", "check": "changelog_2026"},
     {"value": 2, "suffix": "",  "label": "hackathon prizes, solo", "check": "results"},
     {"value": 5, "suffix": "",  "label": "certifications",          "check": "certifications"},
     {"value": 3, "suffix": "+", "label": "years on Python"},
@@ -240,6 +240,9 @@ UPSTREAM = [
 # Every other hackathon entered in 2026, newest first. Outcome says only what is
 # known: "Submitted" means submitted, nothing more is claimed.
 ENTRIES = [
+    {"when": "Nov 2026", "event": "Catalyst Solo AI Hackathon", "organizer": "Makers Need More × PromptWars",
+     "build": "CareCircle", "what": "a shared care book where missed doses climb from the elder to the family",
+     "outcome": "Round 1: 35th of 1,225"},
     {"when": "Nov 2026", "event": "Flip the Switch", "organizer": "WeMakeDevs × DevTools Academy × Switch",
      "build": "Jaisa Kaha", "what": "an AI scribe that won't invent a cook's quantities",
      "outcome": "Submitted · Track 02"},
@@ -567,6 +570,19 @@ FEATURES = [
 # `href` (optional) links to the build's feature page or its prize.
 
 CHANGELOG = [
+    {"period": "Nov 2026", "name": "CareCircle",
+     "context": "Catalyst Solo AI Hackathon · Makers Need More × PromptWars · solo",
+     "detail": "A care book shared by an elder, their caretakers and family, built in 7 hours. "
+               "Each person has their own passcode and only the elder decides who sees what. "
+               "Doses are stamped like a bank passbook, a missed one emails the caretakers at "
+               "30 minutes and the family at 60, and Gemini turns a prescription photo or a "
+               "Hindi voice note into a draft the elder confirms. Ranked 35th of 1,225 in the "
+               "automated Round 1 review, 96.62/100.",
+     "tech": ["Cloud Run", "Firestore", "Gemini", "Cloud Text-to-Speech", "Cloud Scheduler",
+              "FastAPI"],
+     "links": [{"label": "Try it live", "href": "https://carecircle-641776536530.asia-south1.run.app"},
+               {"label": "Source", "href": "https://github.com/aryangorde6/carecircle"}]},
+
     {"period": "Nov 2026", "name": "Jaisa Kaha", "hindi": "जैसा कहा", "href": "/jaisa-kaha/",
      "context": "Flip the Switch · WeMakeDevs × DevTools Academy × Switch · solo",
      "detail": "An AI scribe for a family's recipes that writes down only the amounts the cook "

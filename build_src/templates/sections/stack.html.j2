@@ -7,7 +7,9 @@
       <li class="layer">
         <h3 class="layer-name">{{ s.label }}</h3>
         <p class="layer-note">{{ s.note }}</p>
-        <p class="layer-items">{{ s['items']|join(' · ') }}</p>
+        {#- no-break spaces inside a tool's name, and the dot stays with the tool before it,
+            so a line only ever breaks between tools #}
+        <p class="layer-items">{{ s['items']|map('replace', ' ', '\u00a0')|join('\u00a0· ') }}</p>
       </li>
       {%- endfor %}
     </ol>

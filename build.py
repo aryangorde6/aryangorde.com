@@ -411,6 +411,7 @@ def build(out_root: Path, quiet=False) -> dict:
         languages=content.LANGUAGES, features=features, changelog=content.CHANGELOG,
         education=content.EDUCATION, certifications=content.CERTIFICATIONS,
         contact=content.CONTACT, colophon=content.COLOPHON, fonts=fonts, photo=photo,
+        page_weight=content.PAGE_WEIGHT.format(kb=WEIGHT_TOKEN),
         awards=awards, videos=videos, tripwire=drawings.tripwire_homes(),
         css=css, js=js, year=datetime.now().year,
     )
@@ -435,6 +436,8 @@ def build(out_root: Path, quiet=False) -> dict:
           "og_alt": home["og_alt"], "hindi": False}
     pages["404.html"] = env.get_template("404.html.j2").render(page=nf, **common)
 
+    pages = {name: stamp_weight(html) for name, html in pages.items()}
+
     problems = []
     for name, html in pages.items():
         problems += check_page(name, html, css)
@@ -451,6 +454,27 @@ def build(out_root: Path, quiet=False) -> dict:
         dest.parent.mkdir(parents=True, exist_ok=True)
         dest.write_text(html, encoding="utf-8")
     return pages
+
+
+WEIGHT_TOKEN = "@@PAGE_KB@@"
+
+
+def stamp_weight(html: str) -> str:
+    """Write each page's own size into its footer.
+
+    The number is part of the page, so this repeats until the figure stops
+    changing (once or twice). Uncompressed bytes, not gzipped: zlib builds
+    differ between machines, and `--check` has to give the same answer in CI
+    as here.
+    """
+    kb = 0
+    for _ in range(6):
+        out = html.replace(WEIGHT_TOKEN, str(kb))
+        new = round(len(out.encode()) / 1024)
+        if new == kb:
+            return out
+        kb = new
+    sys.exit("page weight did not settle")
 
 
 def report(pages: dict):

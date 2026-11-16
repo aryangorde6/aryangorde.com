@@ -1,0 +1,46 @@
+name: Deploy
+
+# Every push to main publishes the site: infra/deploy.sh checks that the built pages
+# match their sources (build.py --check) and that the public résumé has no phone number,
+# then uploads to S3 and refreshes CloudFront. If a check fails, nothing is uploaded.
+#
+# No AWS keys are stored on GitHub. The job trades GitHub's OIDC token for a role that
+# only this repo's main branch can assume (DeployRole in infra/site.yaml); its ARN is the
+# repo secret AWS_DEPLOY_ROLE_ARN.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: "3.14"
+
+      - name: Install the build's dependencies
+        run: |
+          python -m pip install --quiet jinja2==3.1.6 pillow==12.1.1
+          sudo apt-get install --yes --quiet --no-install-recommends poppler-utils
+
+      - uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0
+        with:
+          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ap-south-1
+
+      - name: Check and deploy
+        run: infra/deploy.sh

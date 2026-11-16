@@ -91,7 +91,7 @@ images/, fonts/, video/, og/ ← GENERATED (resized or copied from build_src)
 | Prizes | One spread per prize, each with a detail of the organisers' own winners graphic (header + Aryan's row only, joined by a break line; the other winners are cut out). The Rote spread has a 64 KiB slider: drag the output size and watch what the runtime kept while it reported success. |
 | Open source | The fixes merged into NumPy (#32915) and Pillow (#10147, shipped in 13.0.0), then every other 2026 entry in a table. |
 | About | Lede, bio, facts, four figures (each checked against the page by the build). |
-| Stack | The tools by where they sit in a request, as a list. |
+| Stack | The tools by where they sit in a request, as a list. Only tools a public aryangorde6 repo (or this site) uses; `content.py` notes which repo shows each. |
 | Everything shipped | Every 2026 build, newest first, with education and certifications alongside. |
 | Contact | The yellow back cover: headline, email with copy, link rows. |
 
@@ -176,11 +176,19 @@ AWS, defined in [`infra/site.yaml`](infra/site.yaml) (CloudFormation, stack
 DNS stays at Hostinger: `@` is an ALIAS and `www` a CNAME to the distribution's
 `*.cloudfront.net` name (see [`infra/HOSTINGER_DNS.md`](infra/HOSTINGER_DNS.md)).
 
-To publish a change:
+To publish a change, rebuild, commit and push to `main`:
 
 ```bash
-python3 build.py && infra/deploy.sh
+python3 build.py
+git commit -am "…" && git push origin main
 ```
+
+[`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) then runs `infra/deploy.sh` on
+GitHub, so what's on `main` is what's live. It holds no AWS keys: it trades GitHub's OIDC
+token for `aryangorde-site-github-deploy`, a role in `site.yaml` that only this repo's `main`
+branch can assume and that can only read the stack's outputs, write the site bucket and clear
+the distribution's cache (its ARN is the repo secret `AWS_DEPLOY_ROLE_ARN`). From a laptop,
+`infra/deploy.sh` still works on its own with the `hackathon` AWS profile.
 
 `deploy.sh` checks that every page matches `build_src/` and that the public résumé is the
 copy without the phone number, uploads **only** the pages (`index.html`, `404.html`, the

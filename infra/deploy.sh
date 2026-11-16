@@ -1,16 +1,22 @@
 #!/usr/bin/env bash
 # Uploads the built site to S3 and refreshes CloudFront.
 #   infra/deploy.sh            (uses the "hackathon" AWS profile; override with AWS_PROFILE=…)
+# GitHub Actions runs it too, on every push to main (.github/workflows/deploy.yml): there the
+# credentials come from the environment (an OIDC role), so no profile is used.
 # Only the public site goes up: the pages (index.html, 404.html, one folder per feature),
 # the résumé PDF, images/, fonts/, video/ and og/.
 # Never build_src/, state.md, resume/, README.md, Fintrack/ or anything else in the repo.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-PROFILE="${AWS_PROFILE:-hackathon}"
 REGION=ap-south-1
 STACK=aryangorde-site
-aws() { command aws --profile "$PROFILE" --region "$REGION" "$@"; }
+if [[ -n "${AWS_ACCESS_KEY_ID:-}" && -z "${AWS_PROFILE:-}" ]]; then
+  aws() { command aws --region "$REGION" "$@"; }                      # CI: keys in the environment
+else
+  PROFILE="${AWS_PROFILE:-hackathon}"
+  aws() { command aws --profile "$PROFILE" --region "$REGION" "$@"; }  # laptop: named profile
+fi
 
 # 1. The pages must match their sources, and the public résumé must be the copy without the phone.
 #    Matches any Indian mobile number (+91 optional, spaces/dashes allowed), so the number

@@ -267,28 +267,36 @@ ENTRIES = [
 ]
 
 # --- stack ------------------------------------------------------------------
-# The tools, by the hop where they do their job in a request.
-
+# The tools, by the hop where they do their job in a request. Only tools that a
+# public aryangorde6 repo (or this site) actually uses: checked repo by repo on
+# 16 Nov 2026 (dependency files, workflows, READMEs). Add a tool only with a repo
+# that shows it.
 STACK = [
     {"label": "Client", "note": "Enough frontend to ship the whole thing solo.",
-     "items": ["React", "Next.js", "Tailwind", "Chart.js", "Vanilla JS"]},
-    {"label": "Edge", "note": "Off the laptop, and staying up.",
-     "items": ["Nginx", "Gunicorn"]},
+     "items": ["Vanilla JS", "Jinja2", "WebSockets"]},                        # carecircle, teesra-kaan, this site
+    {"label": "Edge", "note": "Where a request comes in.",
+     "items": ["CloudFront", "Telegram bots", "Discord"]},                     # this site; pukaar, teesri-shikayat; jaisa-kaha
+    {"label": "Voice", "note": "Speech in, speech out, Hindi included.",
+     "items": ["AWS Transcribe", "Muse Voice Transcribe", "Polly", "Cloud Text-to-Speech"]},
     {"label": "Application", "note": "Where most of the time goes.",
-     "items": ["Django", "DRF", "FastAPI", "Express", "Node.js"]},
-    {"label": "Data", "note": "Storage, cache, and the queries between.",
-     "items": ["PostgreSQL", "MongoDB Atlas", "Redis", "SQLite", "ChromaDB"]},
+     "items": ["FastAPI", "Uvicorn", "Pydantic"]},                             # carecircle, teesra-kaan, contour
+    {"label": "Data", "note": "Storage, and the queries between.",
+     "items": ["DynamoDB", "Firestore", "FalkorDB", "S3"]},                    # pukaar, teesri; carecircle; shaky-ground
     {"label": "Async", "note": "Work that shouldn't block a request.",
-     "items": ["Celery", "Redis"]},
+     "items": ["Step Functions", "EventBridge", "SQS", "Cloud Scheduler"]},    # pukaar, teesri; carecircle
     {"label": "AI", "note": "Used where it earns its latency.",
-     "items": ["Groq · Llama 3.3", "Vertex AI · Gemini", "Amazon Bedrock", "Ollama", "Hybrid retrieval"]},
+     "items": ["Amazon Bedrock", "Gemini on Vertex AI", "Muse Spark", "Groq",
+               "Gemma 4 on llama.cpp", "Strands", "Cedar", "MCP"]},
     {"label": "Runtime", "note": "Where it all runs.",
-     "items": ["Docker", "AWS EC2", "Cloud Run"]},
-    {"label": "CI / CD", "note": "Tests on every push; main deploys on green.",
-     "items": ["GitHub Actions", "Jenkins"]},
+     "items": ["Docker", "AWS Lambda", "Amazon EC2", "Cloud Run"]},
+    {"label": "Infrastructure", "note": "Written down, so it can be rebuilt.",
+     "items": ["Terraform", "AWS CDK", "CloudFormation"]},                     # pukaar; teesri-shikayat; this site
+    {"label": "CI / CD", "note": "Tests on every push. This site deploys itself from main.",
+     "items": ["GitHub Actions", "pytest"]},
 ]
 
-LANGUAGES = ["Python", "TypeScript", "JavaScript", "SQL", "Bash", "C"]
+# TypeScript: the Rote plays. HCL: pukaar's Terraform. Cypher: shaky-ground.
+LANGUAGES = ["Python", "TypeScript", "JavaScript", "Bash", "Cypher", "HCL"]
 
 # --- features: one page each ----------------------------------------------------
 # Only projects on github.com/aryangorde6 (Aryan, 08 Nov 2026). Sources: each repo's
@@ -704,3 +712,5 @@ COLOPHON = (
     "a small Python script (Jinja2 templates, content as Python data, a Pillow image "
     "pipeline) into static pages that make no third-party requests."
 )
+# Follows the colophon on every page. build.py fills in {kb}, that page's own size.
+PAGE_WEIGHT = "This page’s HTML, with its styles and scripts inside, is {kb} KB. It sets no cookies."

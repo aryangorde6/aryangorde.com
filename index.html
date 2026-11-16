@@ -1682,38 +1682,36 @@ html:not(.js) .nav {
 
     <ol class="layers">      <li class="layer">
         <h3 class="layer-name">Client</h3>
-        <p class="layer-note">Enough frontend to ship the whole thing solo.</p>
-        <p class="layer-items">React · Next.js · Tailwind · Chart.js · Vanilla JS</p>
+        <p class="layer-note">Enough frontend to ship the whole thing solo.</p>        <p class="layer-items">Vanilla JS · Jinja2 · WebSockets</p>
       </li>      <li class="layer">
         <h3 class="layer-name">Edge</h3>
-        <p class="layer-note">Off the laptop, and staying up.</p>
-        <p class="layer-items">Nginx · Gunicorn</p>
+        <p class="layer-note">Where a request comes in.</p>        <p class="layer-items">CloudFront · Telegram bots · Discord</p>
+      </li>      <li class="layer">
+        <h3 class="layer-name">Voice</h3>
+        <p class="layer-note">Speech in, speech out, Hindi included.</p>        <p class="layer-items">AWS Transcribe · Muse Voice Transcribe · Polly · Cloud Text-to-Speech</p>
       </li>      <li class="layer">
         <h3 class="layer-name">Application</h3>
-        <p class="layer-note">Where most of the time goes.</p>
-        <p class="layer-items">Django · DRF · FastAPI · Express · Node.js</p>
+        <p class="layer-note">Where most of the time goes.</p>        <p class="layer-items">FastAPI · Uvicorn · Pydantic</p>
       </li>      <li class="layer">
         <h3 class="layer-name">Data</h3>
-        <p class="layer-note">Storage, cache, and the queries between.</p>
-        <p class="layer-items">PostgreSQL · MongoDB Atlas · Redis · SQLite · ChromaDB</p>
+        <p class="layer-note">Storage, and the queries between.</p>        <p class="layer-items">DynamoDB · Firestore · FalkorDB · S3</p>
       </li>      <li class="layer">
         <h3 class="layer-name">Async</h3>
-        <p class="layer-note">Work that shouldn't block a request.</p>
-        <p class="layer-items">Celery · Redis</p>
+        <p class="layer-note">Work that shouldn't block a request.</p>        <p class="layer-items">Step Functions · EventBridge · SQS · Cloud Scheduler</p>
       </li>      <li class="layer">
         <h3 class="layer-name">AI</h3>
-        <p class="layer-note">Used where it earns its latency.</p>
-        <p class="layer-items">Groq · Llama 3.3 · Vertex AI · Gemini · Amazon Bedrock · Ollama · Hybrid retrieval</p>
+        <p class="layer-note">Used where it earns its latency.</p>        <p class="layer-items">Amazon Bedrock · Gemini on Vertex AI · Muse Spark · Groq · Gemma 4 on llama.cpp · Strands · Cedar · MCP</p>
       </li>      <li class="layer">
         <h3 class="layer-name">Runtime</h3>
-        <p class="layer-note">Where it all runs.</p>
-        <p class="layer-items">Docker · AWS EC2 · Cloud Run</p>
+        <p class="layer-note">Where it all runs.</p>        <p class="layer-items">Docker · AWS Lambda · Amazon EC2 · Cloud Run</p>
+      </li>      <li class="layer">
+        <h3 class="layer-name">Infrastructure</h3>
+        <p class="layer-note">Written down, so it can be rebuilt.</p>        <p class="layer-items">Terraform · AWS CDK · CloudFormation</p>
       </li>      <li class="layer">
         <h3 class="layer-name">CI / CD</h3>
-        <p class="layer-note">Tests on every push; main deploys on green.</p>
-        <p class="layer-items">GitHub Actions · Jenkins</p>
+        <p class="layer-note">Tests on every push. This site deploys itself from main.</p>        <p class="layer-items">GitHub Actions · pytest</p>
       </li>    </ol>
-    <p class="langs"><span class="label">Written in</span> Python · TypeScript · JavaScript · SQL · Bash · C</p>
+    <p class="langs"><span class="label">Written in</span> Python · TypeScript · JavaScript · Bash · Cypher · HCL</p>
   </div>
 </section><section class="section paper" id="changelog" aria-labelledby="changelog-title">
   <div class="wrap">
@@ -1835,7 +1833,7 @@ html:not(.js) .nav {
       <a href="https://www.linkedin.com/in/aryan-gorde-6b660a264/" target="_blank" rel="noopener">LinkedIn</a>
       <a href="/Aryan_Gorde_Resume.pdf">Résumé</a>
     </p>
-    <p class="colophon">Set in Big Shoulders Display, Newsreader and Anek Devanagari, all self-hosted. Built by a small Python script (Jinja2 templates, content as Python data, a Pillow image pipeline) into static pages that make no third-party requests.</p>
+    <p class="colophon">Set in Big Shoulders Display, Newsreader and Anek Devanagari, all self-hosted. Built by a small Python script (Jinja2 templates, content as Python data, a Pillow image pipeline) into static pages that make no third-party requests. This page’s HTML, with its styles and scripts inside, is 98 KB. It sets no cookies.</p>
     <p class="foot-copy">© 2026 Aryan Gorde · Mumbai, India</p>
   </div>
 </footer>

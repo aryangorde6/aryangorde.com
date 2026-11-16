@@ -21,9 +21,17 @@ Parameters:
       Attach www.DomainName too. "false" while the certificate covers only the bare domain
       (e.g. www still points elsewhere and its CAA blocks Amazon).
 
+  GitHubRepo:
+    Type: String
+    Default: aryangorde6/aryangorde.com
+    Description: >-
+      The repository whose main branch may deploy the site (GitHub Actions, OIDC).
+      Empty = no deploy role.
+
 Conditions:
   HasCert: !Not [!Equals [!Ref CertificateArn, ""]]
   WithWww: !And [!Condition HasCert, !Equals [!Ref IncludeWww, "true"]]
+  WithDeployRole: !Not [!Equals [!Ref GitHubRepo, ""]]
 
 Resources:
   # Private bucket: nothing is public; only this distribution can read it (OAC below).
@@ -223,6 +231,54 @@ Resources:
               StringEquals:
                 AWS:SourceArn: !Sub "arn:aws:cloudfront::${AWS::AccountId}:distribution/${Distribution}"
 
+  # GitHub Actions signs in with a short-lived OIDC token instead of stored AWS keys.
+  # The provider is account-wide (one per URL): another repo in this account that wants
+  # the same thing must reuse this one, not create a second.
+  GitHubOidc:
+    Type: AWS::IAM::OIDCProvider
+    Condition: WithDeployRole
+    Properties:
+      Url: https://token.actions.githubusercontent.com
+      ClientIdList: [sts.amazonaws.com]
+
+  # Only a workflow on GitHubRepo's main branch can assume this role (not PRs, forks or
+  # other branches), and it can only do what infra/deploy.sh does: read the stack's
+  # outputs, write this bucket, and invalidate this distribution.
+  DeployRole:
+    Type: AWS::IAM::Role
+    Condition: WithDeployRole
+    Properties:
+      RoleName: !Sub "${AWS::StackName}-github-deploy"
+      MaxSessionDuration: 3600
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Federated: !Ref GitHubOidc
+            Action: sts:AssumeRoleWithWebIdentity
+            Condition:
+              StringEquals:
+                token.actions.githubusercontent.com:aud: sts.amazonaws.com
+                token.actions.githubusercontent.com:sub: !Sub "repo:${GitHubRepo}:ref:refs/heads/main"
+      Policies:
+        - PolicyName: deploy-site
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: cloudformation:DescribeStacks
+                Resource: !Ref AWS::StackId
+              - Effect: Allow
+                Action: s3:ListBucket
+                Resource: !GetAtt SiteBucket.Arn
+              - Effect: Allow
+                Action: [s3:GetObject, s3:PutObject, s3:DeleteObject]
+                Resource: !Sub "${SiteBucket.Arn}/*"
+              - Effect: Allow
+                Action: [cloudfront:CreateInvalidation, cloudfront:GetInvalidation]
+                Resource: !Sub "arn:aws:cloudfront::${AWS::AccountId}:distribution/${Distribution}"
+
 Outputs:
   BucketName:
     Value: !Ref SiteBucket
@@ -231,3 +287,7 @@ Outputs:
   DistributionDomain:
     Description: Point the DNS records at this name.
     Value: !GetAtt Distribution.DomainName
+  DeployRoleArn:
+    Condition: WithDeployRole
+    Description: Role for .github/workflows/deploy.yml (stored as the repo secret AWS_DEPLOY_ROLE_ARN).
+    Value: !GetAtt DeployRole.Arn
